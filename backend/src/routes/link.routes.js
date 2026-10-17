@@ -7,13 +7,19 @@ import { loadWorkspace, requireWorkspaceRole } from '../middleware/workspace.mid
 import { loadLinkAccess } from '../middleware/link.middleware.js';
 import { loadImportAccess } from '../middleware/import.middleware.js';
 import { uploadCsv } from '../middleware/upload.middleware.js';
-import { importLimiter } from '../middleware/rateLimit.middleware.js';
+import { importLimiter, linkCreateLimiter } from '../middleware/rateLimit.middleware.js';
 
 const router = Router();
 
 router.use(authenticate);
 
-router.post('/', loadWorkspace, requireWorkspaceRole('editor'), linkController.create);
+router.post(
+  '/',
+  loadWorkspace,
+  requireWorkspaceRole('editor'),
+  linkCreateLimiter,
+  linkController.create
+);
 
 router.get('/', loadWorkspace, requireWorkspaceRole('viewer'), linkController.list);
 

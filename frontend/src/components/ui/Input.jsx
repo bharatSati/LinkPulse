@@ -29,7 +29,7 @@ const Input = forwardRef(function Input(
           id={inputId}
           type={resolvedType}
           className={cn(
-            'h-11 w-full rounded-xl border bg-base-850 px-3 text-sm text-ink-100 placeholder:text-ink-500',
+            'h-11 w-full rounded-none border-2 bg-base-850 px-3 text-sm text-ink-100 placeholder:text-ink-500',
             'transition focus:outline-none focus:ring-2 focus:ring-accent-500/40',
             'disabled:cursor-not-allowed disabled:opacity-60',
             Icon && 'pl-9',

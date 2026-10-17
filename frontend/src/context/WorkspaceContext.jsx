@@ -2,6 +2,7 @@ import { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import * as workspaceService from '../services/workspace.service.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { useToast } from '../hooks/useToast.js';
+import { can as roleCan } from '../utils/permissions.js';
 
 const STORAGE_KEY = 'linkpulse.activeWorkspace';
 
@@ -74,6 +75,25 @@ export function WorkspaceProvider({ children }) {
     [workspaces, activeWorkspaceId]
   );
 
+  const role = useMemo(() => {
+    if (!activeWorkspace || !user) return null;
+
+    const ownerId =
+      typeof activeWorkspace.owner === 'object'
+        ? activeWorkspace.owner?._id
+        : activeWorkspace.owner;
+    if (ownerId && String(ownerId) === String(user._id)) return 'owner';
+
+    const membership = (activeWorkspace.members || []).find((member) => {
+      const memberId = typeof member.user === 'object' ? member.user?._id : member.user;
+      return String(memberId) === String(user._id);
+    });
+
+    return membership?.role || null;
+  }, [activeWorkspace, user]);
+
+  const can = useCallback((permission) => roleCan(role, permission), [role]);
+
   const value = useMemo(
     () => ({
       workspaces,
@@ -83,8 +103,22 @@ export function WorkspaceProvider({ children }) {
       refresh,
       loading,
       ready,
+      role,
+      can,
+      isOwner: role === 'owner',
+      isAdmin: role === 'owner' || role === 'admin',
     }),
-    [workspaces, activeWorkspace, activeWorkspaceId, selectWorkspace, refresh, loading, ready]
+    [
+      workspaces,
+      activeWorkspace,
+      activeWorkspaceId,
+      selectWorkspace,
+      refresh,
+      loading,
+      ready,
+      role,
+      can,
+    ]
   );
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;

@@ -55,7 +55,7 @@ export default function CampaignCard({ campaign, onOpen, onEdit, onToggleStatus,
           {campaign.tags.map((tag) => (
             <span
               key={tag.id}
-              className="inline-flex items-center gap-1 rounded-full border border-base-600 bg-base-800 px-2 py-0.5 text-[11px] text-ink-300"
+              className="inline-flex items-center gap-1 rounded-none border border-base-600 bg-base-800 px-2 py-0.5 text-[11px] text-ink-300"
             >
               <TagIcon className="h-2.5 w-2.5 text-accent-400" />
               {tag.name}

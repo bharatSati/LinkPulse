@@ -14,17 +14,17 @@ export default function AuthLayout() {
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       <div className="relative hidden flex-col justify-between overflow-hidden border-r border-base-800 bg-base-900 p-12 lg:flex">
         <div className="absolute inset-0 grid-noise opacity-60" aria-hidden="true" />
-        <div className="absolute -left-24 top-1/3 h-72 w-72 rounded-full bg-accent-500/10 blur-3xl" aria-hidden="true" />
+        <div className="absolute -left-24 top-1/3 h-72 w-72 border-2 border-accent-700/40 bg-accent-500/5" aria-hidden="true" />
 
         <div className="relative">
           <Logo />
         </div>
 
         <div className="relative max-w-md">
-          <h1 className="text-3xl font-semibold leading-tight tracking-tight text-ink-100">
+          <h1 className="text-2xl font-normal leading-relaxed tracking-tight text-ink-100">
             Every link,
             <br />
-            <span className="text-accent-400">measured in real time.</span>
+            <span className="text-gradient">measured in real time.</span>
           </h1>
           <p className="mt-4 text-sm leading-relaxed text-ink-400">
             LinkPulse brings short links, campaigns, QR codes, and analytics into one

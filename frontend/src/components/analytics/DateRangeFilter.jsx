@@ -19,7 +19,7 @@ export default function DateRangeFilter({ preset, custom, onPresetChange, onCust
             type="button"
             onClick={() => onPresetChange(option.value)}
             className={cn(
-              'rounded-[10px] px-3 py-1.5 text-xs font-medium transition',
+              'rounded-none px-3 py-1.5 text-xs font-medium uppercase tracking-wide transition',
               preset === option.value
                 ? 'bg-accent-500 text-base-950'
                 : 'text-ink-300 hover:text-ink-100'

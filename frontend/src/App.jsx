@@ -1,8 +1,9 @@
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute.jsx';
 import PublicOnlyRoute from './components/PublicOnlyRoute.jsx';
 import AuthLayout from './layouts/AuthLayout.jsx';
 import DashboardLayout from './layouts/DashboardLayout.jsx';
+import Landing from './pages/Landing.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Overview from './pages/Overview.jsx';
@@ -12,8 +13,12 @@ import CampaignDetail from './pages/CampaignDetail.jsx';
 import Analytics from './pages/Analytics.jsx';
 import QrCodes from './pages/QrCodes.jsx';
 import BioPages from './pages/BioPages.jsx';
+import BioPageEditor from './pages/BioPageEditor.jsx';
+import PublicBioPage from './pages/PublicBioPage.jsx';
 import AiInsights from './pages/AiInsights.jsx';
+import AcceptInvitation from './pages/AcceptInvitation.jsx';
 import Team from './pages/Team.jsx';
+import Abuse from './pages/Abuse.jsx';
 import Settings from './pages/Settings.jsx';
 import NotFound from './pages/NotFound.jsx';
 
@@ -27,7 +32,11 @@ export default function App() {
         </Route>
       </Route>
 
-      <Route path="/" element={<Navigate to="/app" replace />} />
+      <Route path="/" element={<Landing />} />
+
+      <Route path="/bio/:username" element={<PublicBioPage />} />
+
+      <Route path="/invite/:token" element={<AcceptInvitation />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/app" element={<DashboardLayout />}>
@@ -38,8 +47,11 @@ export default function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="qr-codes" element={<QrCodes />} />
           <Route path="bio-pages" element={<BioPages />} />
+          <Route path="bio-pages/new" element={<BioPageEditor />} />
+          <Route path="bio-pages/:id" element={<BioPageEditor />} />
           <Route path="ai-insights" element={<AiInsights />} />
           <Route path="team" element={<Team />} />
+          <Route path="abuse" element={<Abuse />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Route>

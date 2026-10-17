@@ -80,7 +80,7 @@ export default function LinkCard({
             <button
               type="button"
               onClick={() => onViewCampaign?.(link)}
-              className="inline-flex max-w-full items-center gap-1.5 truncate rounded-full border border-accent-600/40 bg-accent-500/10 px-2.5 py-0.5 text-[11px] text-accent-300 transition hover:bg-accent-500/20"
+              className="inline-flex max-w-full items-center gap-1.5 truncate rounded-none border border-accent-600/40 bg-accent-500/10 px-2.5 py-0.5 text-[11px] text-accent-300 transition hover:bg-accent-500/20"
               title={link.campaign.name}
             >
               <Megaphone className="h-3 w-3 shrink-0" />
@@ -90,7 +90,7 @@ export default function LinkCard({
           {link.tags?.map((tag) => (
             <span
               key={tag.id}
-              className="inline-flex items-center gap-1 rounded-full border border-base-600 bg-base-800 px-2 py-0.5 text-[11px] text-ink-300"
+              className="inline-flex items-center gap-1 rounded-none border border-base-600 bg-base-800 px-2 py-0.5 text-[11px] text-ink-300"
             >
               <TagIcon className="h-2.5 w-2.5 text-accent-400" />
               {tag.name}

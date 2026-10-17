@@ -99,7 +99,7 @@ export default function TagInput({
           {selectedTags.map((tag) => (
             <span
               key={tag.id}
-              className="inline-flex items-center gap-1 rounded-full border border-base-600 bg-base-800 px-2 py-0.5 text-xs text-ink-200"
+              className="inline-flex items-center gap-1 rounded-none border border-base-600 bg-base-800 px-2 py-0.5 text-xs text-ink-200"
             >
               <TagIcon className="h-3 w-3 text-accent-400" />
               {tag.name}

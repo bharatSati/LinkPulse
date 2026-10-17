@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Mail, Lock, ArrowRight } from 'lucide-react';
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
@@ -11,6 +11,8 @@ export default function Login() {
   const { login } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || '/app';
 
   const [form, setForm] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -38,7 +40,7 @@ export default function Login() {
     try {
       await login({ email: form.email.trim(), password: form.password });
       toast.success('Welcome back to LinkPulse');
-      navigate('/app', { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       setErrors({ form: error.message });
       toast.error(error.message);

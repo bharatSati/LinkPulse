@@ -2,14 +2,16 @@ import { NavLink } from 'react-router-dom';
 import { X } from 'lucide-react';
 import Logo from './ui/Logo.jsx';
 import { NAV_SECTIONS } from '../config/navigation.js';
+import { useWorkspace } from '../hooks/useWorkspace.js';
 import { cn } from '../utils/cn.js';
 
 export default function Sidebar({ open, onClose }) {
+  const { can } = useWorkspace();
   return (
     <>
       {open && (
         <div
-          className="fixed inset-0 z-40 animate-fade-in bg-base-950/70 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 animate-fade-in bg-base-950/80 lg:hidden"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -40,7 +42,9 @@ export default function Sidebar({ open, onClose }) {
                 {section.label}
               </p>
               <ul className="space-y-1">
-                {section.items.map((item) => (
+                {section.items
+                  .filter((item) => !item.permission || can(item.permission))
+                  .map((item) => (
                   <li key={item.to}>
                     <NavLink
                       to={item.to}
@@ -48,9 +52,9 @@ export default function Sidebar({ open, onClose }) {
                       onClick={onClose}
                       className={({ isActive }) =>
                         cn(
-                          'group flex items-center gap-3 rounded-xl px-3 py-2 text-sm transition',
+                          'group relative flex items-center gap-3 px-3 py-2 text-sm transition',
                           isActive
-                            ? 'bg-accent-500/12 text-accent-300 ring-1 ring-inset ring-accent-600/30'
+                            ? 'bg-accent-gradient-soft text-accent-300 shadow-[inset_2px_0_0_0_#cdf23f]'
                             : 'text-ink-300 hover:bg-base-800 hover:text-ink-100'
                         )
                       }
@@ -66,10 +70,13 @@ export default function Sidebar({ open, onClose }) {
         </nav>
 
         <div className="border-t border-base-800 p-4">
-          <div className="rounded-xl bg-base-850 p-3 ring-1 ring-base-700">
-            <p className="text-xs font-medium text-ink-200">Foundation release</p>
-            <p className="mt-1 text-xs text-ink-500">
-              Authentication and workspaces are live. Feature modules arrive next.
+          <div className="surface-card p-3">
+            <p className="flex items-center gap-2 text-xs font-medium text-ink-200">
+              <span className="h-2 w-2 animate-pulse-glow bg-accent-500" />
+              All modules live
+            </p>
+            <p className="mt-1.5 text-xs text-ink-500">
+              Links, analytics, campaigns, QR, bio pages, AI insights, team management, and abuse &amp; safety.
             </p>
           </div>
         </div>

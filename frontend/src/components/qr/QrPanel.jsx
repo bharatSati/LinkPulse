@@ -136,7 +136,7 @@ export default function QrPanel({ link, canEdit = true, onSaved }) {
                 key={preset}
                 type="button"
                 onClick={() => setFgColor(preset)}
-                className="h-6 w-6 rounded-full border border-base-600 transition hover:scale-110"
+                className="h-6 w-6 rounded-none border border-base-600 transition hover:scale-110"
                 style={{ backgroundColor: preset }}
                 aria-label={`Use ${preset}`}
               />

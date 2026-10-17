@@ -2,6 +2,7 @@ import ApiError from '../utils/ApiError.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import Workspace from '../models/Workspace.js';
 import { hasWorkspaceRole } from '../utils/roles.js';
+import { can } from '../utils/permissions.js';
 
 export const loadWorkspace = asyncHandler(async (req, res, next) => {
   const workspaceId =
@@ -39,6 +40,20 @@ export const requireWorkspaceRole = (requiredRole) => (req, res, next) => {
   if (!hasWorkspaceRole(req.workspaceRole, requiredRole)) {
     return next(
       ApiError.forbidden(`This action requires the "${requiredRole}" role or higher`)
+    );
+  }
+
+  return next();
+};
+
+export const requireWorkspacePermission = (permission) => (req, res, next) => {
+  if (!req.workspaceRole) {
+    return next(ApiError.forbidden('Workspace role could not be determined'));
+  }
+
+  if (!can(req.workspaceRole, permission)) {
+    return next(
+      ApiError.forbidden(`Your workspace role does not allow this action (${permission})`)
     );
   }
 

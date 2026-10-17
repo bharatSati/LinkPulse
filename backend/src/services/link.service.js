@@ -7,6 +7,7 @@ import { hashLinkPassword } from '../utils/linkPassword.js';
 import Campaign from '../models/Campaign.js';
 import { resolveTagIds } from './tag.service.js';
 import { isValidObjectId } from '../utils/validators.js';
+import { evaluateLinkCreation } from './abuse.service.js';
 
 const STATUSES = ['active', 'disabled'];
 const MAX_CLICK_LIMIT = 100000000;
@@ -232,6 +233,7 @@ export async function createLink({ workspaceId, ownerId, input }) {
     });
 
     await link.populate(POPULATE);
+    await evaluateLinkCreation({ workspaceId, link });
     return link;
   } catch (error) {
     if (error.code === 11000) {

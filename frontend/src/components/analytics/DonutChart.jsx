@@ -34,7 +34,7 @@ export default function DonutChart({ data }) {
           <li key={item.name || item.type} className="flex items-center justify-between gap-3 text-sm">
             <span className="flex min-w-0 items-center gap-2">
               <span
-                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                className="h-2.5 w-2.5 shrink-0 rounded-none"
                 style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
               />
               <span className="truncate capitalize text-ink-300">{item.name || item.type}</span>

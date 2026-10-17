@@ -21,15 +21,15 @@ export default function Switch({ checked, onChange, label, description, disabled
         disabled={disabled}
         onClick={() => onChange(!checked)}
         className={cn(
-          'relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition',
+          'relative inline-flex h-6 w-11 shrink-0 items-center border-2 transition',
           'disabled:cursor-not-allowed disabled:opacity-50',
-          checked ? 'bg-accent-500' : 'bg-base-600'
+          checked ? 'border-accent-600 bg-accent-500/20' : 'border-base-600 bg-base-850'
         )}
       >
         <span
           className={cn(
-            'inline-block h-4 w-4 transform rounded-full bg-white transition',
-            checked ? 'translate-x-6' : 'translate-x-1'
+            'inline-block h-3.5 w-4 transform transition',
+            checked ? 'translate-x-6 bg-accent-500' : 'translate-x-1 bg-ink-500'
           )}
         />
       </button>

@@ -18,9 +18,9 @@ export default function BarList({ items, emptyMessage = 'No data for this period
               {item.percentage != null && ` · ${item.percentage}%`}
             </span>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-base-800">
+          <div className="h-2 overflow-hidden border border-base-700 bg-base-800">
             <div
-              className="h-full rounded-full bg-accent-500"
+              className="h-full bg-accent-500"
               style={{ width: `${Math.max((item.value / max) * 100, 3)}%` }}
             />
           </div>

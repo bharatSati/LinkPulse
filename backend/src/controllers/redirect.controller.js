@@ -15,6 +15,11 @@ import {
   verifyUnlockToken,
 } from '../services/redirect.service.js';
 import { recordSuccessfulClick } from '../services/tracking.service.js';
+import {
+  evaluateClickSpike,
+  evaluatePasswordFailure,
+  evaluateSourceBurst,
+} from '../services/abuse.service.js';
 
 function wantsJson(req) {
   const accept = req.headers.accept || '';
@@ -120,6 +125,8 @@ export const handleRedirect = asyncHandler(async (req, res) => {
     return sendState(res, req, LINK_STATE.NOT_FOUND, code);
   }
 
+  await evaluateSourceBurst({ link, req });
+
   if (state === LINK_STATE.PASSWORD_REQUIRED && !isUnlocked(req, link)) {
     if (wantsJson(req)) {
       return res.status(401).json({
@@ -144,6 +151,8 @@ export const handleRedirect = asyncHandler(async (req, res) => {
     const refreshed = evaluateLink(await findLinkByCode(code));
     return sendState(res, req, refreshed.state, code);
   }
+
+  await evaluateClickSpike({ link: updated });
 
   const device = detectDevice(req.headers['user-agent']);
   const destination = resolveDestination(updated, device);
@@ -175,6 +184,7 @@ export const handleUnlock = asyncHandler(async (req, res) => {
     typeof password === 'string' && password.length > 0 && verifyLinkPassword(password, link.password);
 
   if (!accepted) {
+    await evaluatePasswordFailure({ link });
     if (wantsJson(req)) {
       return res.status(401).json({ success: false, message: 'Incorrect password', errors: [] });
     }

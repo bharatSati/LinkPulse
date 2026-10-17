@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Mail, Lock, UserRound, ArrowRight } from 'lucide-react';
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
@@ -11,6 +11,8 @@ export default function Register() {
   const { register } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from || '/app';
 
   const [form, setForm] = useState({ name: '', email: '', password: '' });
   const [errors, setErrors] = useState({});
@@ -45,7 +47,7 @@ export default function Register() {
         password: form.password,
       });
       toast.success('Your LinkPulse account is ready');
-      navigate('/app', { replace: true });
+      navigate(redirectTo, { replace: true });
     } catch (error) {
       setErrors({ form: error.message });
       toast.error(error.message);

@@ -8,7 +8,9 @@ import {
   Sparkles,
   Users,
   Settings,
+  ShieldAlert,
 } from 'lucide-react';
+import { PERMISSIONS } from '../utils/permissions.js';
 
 export const NAV_SECTIONS = [
   {
@@ -32,6 +34,12 @@ export const NAV_SECTIONS = [
     label: 'Manage',
     items: [
       { name: 'Team', to: '/app/team', icon: Users },
+      {
+        name: 'Abuse & Safety',
+        to: '/app/abuse',
+        icon: ShieldAlert,
+        permission: PERMISSIONS.ABUSE_MANAGE,
+      },
       { name: 'Settings', to: '/app/settings', icon: Settings },
     ],
   },

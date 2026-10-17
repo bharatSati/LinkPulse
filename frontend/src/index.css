@@ -7,6 +7,12 @@
     color-scheme: dark;
   }
 
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
   html,
   body,
   #root {
@@ -15,49 +21,129 @@
 
   body {
     @apply bg-base-950 text-ink-100 font-sans antialiased;
+    background-image:
+      radial-gradient(ellipse 70% 55% at 12% -10%, rgba(205, 242, 63, 0.14), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 100% 0%, rgba(255, 210, 31, 0.1), transparent 55%),
+      repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.24) 0px,
+        rgba(0, 0, 0, 0.24) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+    background-attachment: fixed;
+    letter-spacing: 0.01em;
+    text-shadow: 0 0 1px rgba(205, 242, 63, 0.2);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  h1,
+  h2 {
+    @apply font-display;
+  }
+
+  h1 {
+    line-height: 1.25;
   }
 
   ::selection {
-    @apply bg-accent-500/30 text-ink-100;
+    @apply bg-accent-500 text-base-950;
   }
 
   *:focus-visible {
-    @apply outline-none ring-2 ring-accent-500/60 ring-offset-2 ring-offset-base-950;
+    @apply outline-none ring-2 ring-accent-500/70 ring-offset-2 ring-offset-base-950;
   }
 
   ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
+    width: 12px;
+    height: 12px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-base-950;
+    @apply bg-base-950 border-l border-base-800;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-base-700 rounded-full border-2 border-base-950;
+    @apply bg-base-700 border-2 border-base-950;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-base-600;
+    @apply bg-accent-700;
   }
 }
 
 @layer components {
   .surface-card {
-    @apply rounded-2xl border border-base-700 bg-base-900/80 shadow-panel backdrop-blur;
+    @apply border-2 border-base-700 bg-base-900 shadow-panel;
+    background-image:
+      linear-gradient(120deg, rgba(205, 242, 63, 0.05), rgba(255, 210, 31, 0.03) 55%, transparent),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 45%);
   }
 
   .field-label {
-    @apply mb-1.5 block text-sm font-medium text-ink-200;
+    @apply mb-1.5 block text-xs uppercase tracking-widest text-accent-400;
   }
 
   .grid-noise {
-    background-image: radial-gradient(
-      circle at 1px 1px,
-      rgba(255, 255, 255, 0.045) 1px,
-      transparent 0
-    );
-    background-size: 22px 22px;
+    background-image:
+      linear-gradient(rgba(205, 242, 63, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(205, 242, 63, 0.06) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+}
+
+@layer utilities {
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .perspective-1600 {
+    perspective: 1600px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px rgba(205, 242, 63, 0.6);
+  }
+
+  .text-gradient {
+    color: #cdf23f;
+    background-image: linear-gradient(120deg, #f2ffb8, #cdf23f 45%, #ffd21f 95%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    text-shadow: none;
+  }
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .text-gradient {
+    color: transparent;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 8s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float,
+  .animate-grid-pan,
+  .animate-marquee,
+  .animate-blink,
+  .text-gradient {
+    animation: none !important;
   }
 }

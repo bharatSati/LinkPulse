@@ -59,6 +59,7 @@ export function resolveDestination(link, device) {
 
 export function createUnlockToken(linkId) {
   return jwt.sign({ sub: String(linkId), scope: UNLOCK_SCOPE }, env.jwtSecret, {
+    algorithm: 'HS256',
     expiresIn: UNLOCK_TTL_SECONDS,
   });
 }
@@ -66,7 +67,7 @@ export function createUnlockToken(linkId) {
 export function verifyUnlockToken(token, linkId) {
   if (!token || !linkId) return false;
   try {
-    const payload = jwt.verify(token, env.jwtSecret);
+    const payload = jwt.verify(token, env.jwtSecret, { algorithms: ['HS256'] });
     return payload.scope === UNLOCK_SCOPE && payload.sub === String(linkId);
   } catch {
     return false;

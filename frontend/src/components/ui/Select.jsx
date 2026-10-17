@@ -21,7 +21,7 @@ const Select = forwardRef(function Select(
           ref={ref}
           id={selectId}
           className={cn(
-            'h-11 w-full appearance-none rounded-xl border bg-base-850 px-3 pr-9 text-sm text-ink-100',
+            'h-11 w-full appearance-none rounded-none border-2 bg-base-850 px-3 pr-9 text-sm text-ink-100',
             'transition focus:outline-none focus:ring-2 focus:ring-accent-500/40',
             error ? 'border-danger-500/60' : 'border-base-600 focus:border-accent-600'
           )}

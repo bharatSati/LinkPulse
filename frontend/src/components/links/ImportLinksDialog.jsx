@@ -331,8 +331,8 @@ export default function ImportLinksDialog({ open, workspaceId, canEdit, onClose,
           )}
 
           {uploading && (
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-base-800">
-              <div className="h-full w-1/3 animate-pulse rounded-full bg-accent-500" />
+            <div className="h-1.5 w-full overflow-hidden rounded-none bg-base-800">
+              <div className="h-full w-1/3 animate-pulse rounded-none bg-accent-500" />
             </div>
           )}
 

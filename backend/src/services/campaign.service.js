@@ -5,6 +5,7 @@ import Link from '../models/Link.js';
 import { listLinks } from './link.service.js';
 import { resolveTagIds } from './tag.service.js';
 import * as analyticsService from './analytics.service.js';
+import { notifyWorkspaceAdmins } from './notification.service.js';
 
 const MAX_PAGE_SIZE = 100;
 
@@ -221,6 +222,17 @@ export async function createCampaign({ workspaceId, ownerId, input }) {
     });
 
     await campaign.populate('tags', 'name key');
+
+    await notifyWorkspaceAdmins({
+      workspaceId,
+      type: 'campaign_event',
+      title: 'Campaign created',
+      message: `Campaign "${campaign.name}" was created.`,
+      targetUrl: '/app/campaigns',
+      dedupeKey: `campaign_created:${campaign.id}`,
+      data: { campaignId: campaign.id },
+    });
+
     return campaign;
   } catch (error) {
     if (error.code === 11000) {
@@ -254,6 +266,7 @@ export async function updateCampaign(campaign, input) {
     campaign.description = parseDescription(input.description);
   }
 
+  const previousStatus = campaign.status;
   if (input?.status !== undefined) {
     campaign.status = parseStatus(input.status);
   }
@@ -289,6 +302,19 @@ export async function updateCampaign(campaign, input) {
   }
 
   await campaign.populate('tags', 'name key');
+
+  if (previousStatus !== campaign.status) {
+    await notifyWorkspaceAdmins({
+      workspaceId: campaign.workspace,
+      type: 'campaign_event',
+      title: 'Campaign status changed',
+      message: `Campaign "${campaign.name}" is now ${campaign.status}.`,
+      targetUrl: '/app/campaigns',
+      dedupeKey: `campaign_status:${campaign.id}:${campaign.status}`,
+      data: { campaignId: String(campaign._id), status: campaign.status },
+    });
+  }
+
   return campaign;
 }
 

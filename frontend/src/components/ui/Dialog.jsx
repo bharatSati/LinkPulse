@@ -25,7 +25,7 @@ export default function Dialog({ open, onClose, title, description, children, fo
   return createPortal(
     <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 animate-fade-in bg-base-950/70 backdrop-blur-sm"
+        className="absolute inset-0 animate-fade-in bg-base-950/80"
         onClick={onClose}
         aria-hidden="true"
       />

@@ -4,13 +4,13 @@ import { cn } from '../../utils/cn.js';
 
 const VARIANTS = {
   primary:
-    'bg-accent-500 text-base-950 hover:bg-accent-400 active:bg-accent-600 font-semibold shadow-glow',
+    'border-accent-400 bg-accent-gradient text-base-950 hover:brightness-110 active:brightness-95 font-semibold shadow-glow',
   secondary:
-    'bg-base-800 text-ink-100 hover:bg-base-700 border border-base-600',
+    'bg-base-800 text-ink-100 hover:bg-base-700 border-base-600',
   outline:
-    'border border-base-600 text-ink-200 hover:border-accent-600 hover:text-accent-300',
-  ghost: 'text-ink-300 hover:bg-base-800 hover:text-ink-100',
-  danger: 'bg-danger-500 text-white hover:bg-danger-600',
+    'border-base-600 text-ink-200 hover:border-accent-600 hover:text-accent-300',
+  ghost: 'border-transparent text-ink-300 hover:bg-base-800 hover:text-ink-100',
+  danger: 'border-danger-500 bg-danger-600 text-white hover:bg-danger-500',
 };
 
 const SIZES = {
@@ -40,8 +40,9 @@ const Button = forwardRef(function Button(
       type={type}
       disabled={disabled || loading}
       className={cn(
-        'inline-flex select-none items-center justify-center gap-2 rounded-xl font-medium transition duration-150',
-        'disabled:cursor-not-allowed disabled:opacity-50',
+        'inline-flex select-none items-center justify-center gap-2 rounded-none border-2 font-medium uppercase tracking-wider transition duration-100',
+        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
+        'disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:border-base-600 disabled:bg-base-800 disabled:bg-none disabled:text-ink-500 disabled:shadow-none disabled:brightness-100',
         VARIANTS[variant],
         SIZES[size],
         className

@@ -15,10 +15,22 @@ const env = {
   backendUrl: process.env.BACKEND_URL || 'http://localhost:5000',
   ipHashSalt: process.env.IP_HASH_SALT || process.env.JWT_SECRET,
   groqApiKey: process.env.GROQ_API_KEY || '',
-  groqModel: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
+  groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+  groqTimeoutMs: Number.parseInt(process.env.GROQ_TIMEOUT_MS, 10) || 20000,
+  aiInsightsTtlMs: Number.parseInt(process.env.AI_INSIGHTS_TTL_MINUTES, 10)
+    ? Number.parseInt(process.env.AI_INSIGHTS_TTL_MINUTES, 10) * 60 * 1000
+    : 30 * 60 * 1000,
+  aiHistoryDays: Number.parseInt(process.env.AI_HISTORY_DAYS, 10) || 60,
+  aiQuestionMaxLength: Number.parseInt(process.env.AI_QUESTION_MAX_LENGTH, 10) || 300,
   importMaxFileMb: Number.parseInt(process.env.IMPORT_MAX_FILE_MB, 10) || 2,
   importMaxRows: Number.parseInt(process.env.IMPORT_MAX_ROWS, 10) || 1000,
+  invitationTtlDays: Number.parseInt(process.env.INVITATION_TTL_DAYS, 10) || 7,
+  emailDeliveryConfigured: Boolean(process.env.EMAIL_DELIVERY_CONFIGURED === 'true'),
 };
+
+export function isAiConfigured() {
+  return Boolean(env.groqApiKey && env.groqModel);
+}
 
 export function getMissingEnv() {
   return required.filter((key) => !process.env[key]);

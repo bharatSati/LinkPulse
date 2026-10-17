@@ -225,6 +225,90 @@ export async function getTopLinks({ workspaceId, linkIds, range, limit = 10 }) {
   }));
 }
 
+export async function getLinkTrends({ workspaceId, range, limit = 50 }) {
+  const scope = buildScope({ workspaceId });
+  const duration = range.to.getTime() - range.from.getTime();
+  const previousFrom = new Date(range.from.getTime() - duration - 1);
+
+  const rows = await ClickEvent.aggregate([
+    {
+      $match: {
+        ...scope,
+        timestamp: { $gte: previousFrom, $lte: range.to },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          link: '$link',
+          period: { $cond: [{ $gte: ['$timestamp', range.from] }, 'current', 'previous'] },
+        },
+        clicks: { $sum: 1 },
+        visitors: { $addToSet: '$ipHash' },
+      },
+    },
+  ]);
+
+  const map = new Map();
+  for (const row of rows) {
+    const key = String(row._id.link);
+    const entry = map.get(key) || {
+      linkId: key,
+      currentClicks: 0,
+      previousClicks: 0,
+      currentVisitors: 0,
+      previousVisitors: 0,
+    };
+    const visitors = row.visitors.filter(Boolean).length;
+    if (row._id.period === 'current') {
+      entry.currentClicks = row.clicks;
+      entry.currentVisitors = visitors;
+    } else {
+      entry.previousClicks = row.clicks;
+      entry.previousVisitors = visitors;
+    }
+    map.set(key, entry);
+  }
+
+  const entries = [...map.values()];
+  if (entries.length === 0) return [];
+
+  const linkIds = entries.map((entry) => new mongoose.Types.ObjectId(entry.linkId));
+  const links = await Link.find({ _id: { $in: linkIds } })
+    .select('title shortCode customAlias status campaign')
+    .lean();
+  const linkMap = new Map(links.map((link) => [String(link._id), link]));
+
+  return entries
+    .map((entry) => {
+      const link = linkMap.get(entry.linkId);
+      const changePercent =
+        entry.previousClicks > 0
+          ? Math.round(((entry.currentClicks - entry.previousClicks) / entry.previousClicks) * 1000) / 10
+          : entry.currentClicks > 0
+            ? 100
+            : 0;
+
+      return {
+        linkId: entry.linkId,
+        title: link?.title || '',
+        code: link?.customAlias || link?.shortCode || null,
+        status: link?.status || 'deleted',
+        campaignId: link?.campaign ? String(link.campaign) : null,
+        currentClicks: entry.currentClicks,
+        previousClicks: entry.previousClicks,
+        currentVisitors: entry.currentVisitors,
+        previousVisitors: entry.previousVisitors,
+        changePercent,
+      };
+    })
+    .sort(
+      (a, b) =>
+        Math.max(b.currentClicks, b.previousClicks) - Math.max(a.currentClicks, a.previousClicks)
+    )
+    .slice(0, clampLimit(limit, 50, 200));
+}
+
 export async function getReferrers({ workspaceId, linkId, linkIds, range, limit = 10 }) {
   const match = withRange(buildScope({ workspaceId, linkId, linkIds }), range);
 

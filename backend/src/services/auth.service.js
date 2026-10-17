@@ -21,6 +21,7 @@ export function comparePassword(plainPassword, storedPassword) {
 
 export function signAuthToken(user) {
   return jwt.sign({ sub: user.id, role: user.role }, env.jwtSecret, {
+    algorithm: 'HS256',
     expiresIn: env.jwtExpiresIn,
   });
 }

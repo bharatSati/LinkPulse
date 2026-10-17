@@ -35,3 +35,36 @@ export const importLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
   max: 30,
 });
+
+export const aiLimiter = rateLimit({
+  ...standardOptions,
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+});
+
+export const aiAskLimiter = rateLimit({
+  ...standardOptions,
+  windowMs: 15 * 60 * 1000,
+  max: 15,
+});
+
+// Public short-link redirects: generous enough for legitimate short bursts
+// (and for the abuse detector to observe a source burst) while still capping
+// per-IP floods.
+export const redirectLimiter = rateLimit({
+  ...standardOptions,
+  windowMs: 60 * 1000,
+  max: 300,
+});
+
+export const abuseReportLimiter = rateLimit({
+  ...standardOptions,
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+});
+
+export const linkCreateLimiter = rateLimit({
+  ...standardOptions,
+  windowMs: 15 * 60 * 1000,
+  max: 50,
+});
