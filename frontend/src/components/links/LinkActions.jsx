@@ -1,4 +1,13 @@
-import { MoreHorizontal, Pencil, Power, Copy, Trash2, BarChart3 } from 'lucide-react';
+import {
+  MoreHorizontal,
+  Pencil,
+  Power,
+  Copy,
+  Trash2,
+  BarChart3,
+  Megaphone,
+  QrCode,
+} from 'lucide-react';
 import Dropdown, { DropdownItem, DropdownDivider } from '../ui/Dropdown.jsx';
 
 export default function LinkActions({
@@ -8,6 +17,8 @@ export default function LinkActions({
   onDelete,
   onCopy,
   onViewAnalytics,
+  onViewCampaign,
+  onShowQr,
   busy = false,
 }) {
   const disabled = link.status === 'disabled';
@@ -31,6 +42,16 @@ export default function LinkActions({
       {onViewAnalytics && (
         <DropdownItem icon={BarChart3} onClick={() => onViewAnalytics(link)}>
           View analytics
+        </DropdownItem>
+      )}
+      {onViewCampaign && link.campaign?.id && (
+        <DropdownItem icon={Megaphone} onClick={() => onViewCampaign(link)}>
+          View campaign
+        </DropdownItem>
+      )}
+      {onShowQr && (
+        <DropdownItem icon={QrCode} onClick={() => onShowQr(link)}>
+          QR code
         </DropdownItem>
       )}
       <DropdownItem icon={Copy} onClick={() => onCopy(link)}>

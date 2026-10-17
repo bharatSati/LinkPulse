@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Search, Link2, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Plus, Search, Link2, RefreshCw, AlertTriangle, Tags, Upload } from 'lucide-react';
 import Button from '../components/ui/Button.jsx';
 import Input from '../components/ui/Input.jsx';
 import Select from '../components/ui/Select.jsx';
@@ -10,11 +10,16 @@ import Dialog from '../components/ui/Dialog.jsx';
 import LinkTable from '../components/links/LinkTable.jsx';
 import LinkCard from '../components/links/LinkCard.jsx';
 import LinkFormDialog from '../components/links/LinkFormDialog.jsx';
+import ImportLinksDialog from '../components/links/ImportLinksDialog.jsx';
+import ManageTagsDialog from '../components/tags/ManageTagsDialog.jsx';
+import QrCodeDialog from '../components/qr/QrCodeDialog.jsx';
 import { useWorkspace } from '../hooks/useWorkspace.js';
 import { useAuth } from '../hooks/useAuth.js';
 import { useToast } from '../hooks/useToast.js';
 import { useDebouncedValue } from '../hooks/useDebouncedValue.js';
 import { listLinks, updateLink, deleteLink as deleteLinkRequest } from '../services/link.service.js';
+import { listAllCampaigns } from '../services/campaign.service.js';
+import { listTags, createTag } from '../services/tag.service.js';
 import { resolveShortUrl } from '../utils/linkDisplay.js';
 import { formatNumber } from '../utils/format.js';
 
@@ -39,7 +44,16 @@ export default function Links() {
   const [searchInput, setSearchInput] = useState('');
   const debouncedSearch = useDebouncedValue(searchInput, 350);
   const [filter, setFilter] = useState('all');
+  const [campaignFilter, setCampaignFilter] = useState('all');
+  const [tagFilter, setTagFilter] = useState('');
   const [page, setPage] = useState(1);
+
+  const [campaigns, setCampaigns] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [tagsLoading, setTagsLoading] = useState(false);
+  const [manageTagsOpen, setManageTagsOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [qrTarget, setQrTarget] = useState(null);
 
   const [links, setLinks] = useState([]);
   const [pagination, setPagination] = useState(null);
@@ -71,9 +85,46 @@ export default function Links() {
 
   const reload = useCallback(() => setReloadToken((token) => token + 1), []);
 
+  const refreshTags = useCallback(async () => {
+    if (!workspaceId) return;
+    setTagsLoading(true);
+    try {
+      setTags(await listTags({ workspaceId }));
+    } catch {
+      setTags([]);
+    } finally {
+      setTagsLoading(false);
+    }
+  }, [workspaceId]);
+
+  useEffect(() => {
+    let current = true;
+    if (!workspaceId) return undefined;
+    listAllCampaigns(workspaceId)
+      .then((result) => {
+        if (current) setCampaigns(result);
+      })
+      .catch(() => {
+        if (current) setCampaigns([]);
+      });
+    return () => {
+      current = false;
+    };
+  }, [workspaceId, reloadToken]);
+
+  useEffect(() => {
+    refreshTags();
+  }, [refreshTags, reloadToken]);
+
+  async function handleCreateTag(name) {
+    const tag = await createTag({ workspaceId, name });
+    await refreshTags();
+    return tag;
+  }
+
   useEffect(() => {
     setPage(1);
-  }, [workspaceId, debouncedSearch, filter]);
+  }, [workspaceId, debouncedSearch, filter, campaignFilter, tagFilter]);
 
   useEffect(() => {
     if (!workspaceId) return undefined;
@@ -86,6 +137,8 @@ export default function Links() {
       workspaceId,
       search: debouncedSearch,
       filter,
+      campaignId: campaignFilter,
+      tagId: tagFilter,
       page,
       limit: PAGE_SIZE,
     })
@@ -104,7 +157,7 @@ export default function Links() {
     return () => {
       current = false;
     };
-  }, [workspaceId, debouncedSearch, filter, page, reloadToken]);
+  }, [workspaceId, debouncedSearch, filter, campaignFilter, tagFilter, page, reloadToken]);
 
   function openCreate() {
     setDialogMode('create');
@@ -143,6 +196,16 @@ export default function Links() {
     navigate(`/app/analytics?link=${link.id}`);
   }
 
+  function handleViewCampaign(link) {
+    if (link.campaign?.id) {
+      navigate(`/app/campaigns/${link.campaign.id}`);
+    }
+  }
+
+  function handleShowQr(link) {
+    setQrTarget(link);
+  }
+
   async function handleCopy(link) {
     const url = resolveShortUrl(link);
     try {
@@ -172,8 +235,22 @@ export default function Links() {
     }
   }
 
-  const hasFilters = debouncedSearch.trim() !== '' || filter !== 'all';
+  const hasFilters =
+    debouncedSearch.trim() !== '' ||
+    filter !== 'all' ||
+    campaignFilter !== 'all' ||
+    tagFilter !== '';
   const totalPages = pagination?.totalPages || 1;
+
+  const campaignFilterOptions = [
+    { value: 'all', label: 'All campaigns' },
+    { value: 'none', label: 'No campaign' },
+    ...campaigns.map((campaign) => ({ value: campaign.id, label: campaign.name })),
+  ];
+  const tagFilterOptions = [
+    { value: '', label: 'All tags' },
+    ...tags.map((tag) => ({ value: tag.id, label: tag.name })),
+  ];
 
   if (!ready && !activeWorkspace) {
     return (
@@ -192,9 +269,22 @@ export default function Links() {
             Create short links, set limits, and route visitors by device.
           </p>
         </div>
-        <Button icon={Plus} onClick={openCreate} disabled={!canEdit || !workspaceId}>
-          New link
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="secondary"
+            icon={Upload}
+            onClick={() => setImportOpen(true)}
+            disabled={!canEdit || !workspaceId}
+          >
+            Import CSV
+          </Button>
+          <Button variant="secondary" icon={Tags} onClick={() => setManageTagsOpen(true)}>
+            Manage tags
+          </Button>
+          <Button icon={Plus} onClick={openCreate} disabled={!canEdit || !workspaceId}>
+            New link
+          </Button>
+        </div>
       </div>
 
       {!canEdit && (
@@ -215,7 +305,19 @@ export default function Links() {
           value={filter}
           options={FILTERS}
           onChange={(event) => setFilter(event.target.value)}
-          className="sm:w-48"
+          className="sm:w-44"
+        />
+        <Select
+          value={campaignFilter}
+          options={campaignFilterOptions}
+          onChange={(event) => setCampaignFilter(event.target.value)}
+          className="sm:w-44"
+        />
+        <Select
+          value={tagFilter}
+          options={tagFilterOptions}
+          onChange={(event) => setTagFilter(event.target.value)}
+          className="sm:w-40"
         />
       </div>
 
@@ -246,6 +348,8 @@ export default function Links() {
                 onClick={() => {
                   setSearchInput('');
                   setFilter('all');
+                  setCampaignFilter('all');
+                  setTagFilter('');
                 }}
               >
                 Clear filters
@@ -274,6 +378,8 @@ export default function Links() {
             onDelete={setDeleteTarget}
             onCopy={handleCopy}
             onViewAnalytics={handleViewAnalytics}
+            onViewCampaign={handleViewCampaign}
+            onShowQr={handleShowQr}
           />
 
           <div className="space-y-3 md:hidden">
@@ -287,6 +393,8 @@ export default function Links() {
                 onDelete={setDeleteTarget}
                 onCopy={handleCopy}
                 onViewAnalytics={handleViewAnalytics}
+                onViewCampaign={handleViewCampaign}
+                onShowQr={handleShowQr}
               />
             ))}
           </div>
@@ -325,11 +433,50 @@ export default function Links() {
         mode={dialogMode}
         link={activeLink}
         workspaceId={workspaceId}
+        campaigns={campaigns}
+        tags={tags}
+        onCreateTag={handleCreateTag}
         onClose={() => {
           setDialogOpen(false);
           setActiveLink(null);
         }}
         onSaved={handleSaved}
+      />
+
+      <ManageTagsDialog
+        open={manageTagsOpen}
+        onClose={() => setManageTagsOpen(false)}
+        workspaceId={workspaceId}
+        tags={tags}
+        loading={tagsLoading}
+        onChanged={async () => {
+          await refreshTags();
+          reload();
+        }}
+      />
+
+      <ImportLinksDialog
+        open={importOpen}
+        workspaceId={workspaceId}
+        canEdit={canEdit}
+        onClose={() => setImportOpen(false)}
+        onImported={() => {
+          reload();
+          refreshTags();
+        }}
+      />
+
+      <QrCodeDialog
+        open={Boolean(qrTarget)}
+        link={qrTarget}
+        canEdit={canEdit}
+        onClose={() => setQrTarget(null)}
+        onSaved={(data) => {
+          setQrTarget(data.link);
+          setLinks((current) =>
+            current.map((item) => (item.id === data.link.id ? data.link : item))
+          );
+        }}
       />
 
       <Dialog

@@ -3,7 +3,7 @@ import { ChevronDown } from 'lucide-react';
 import { cn } from '../../utils/cn.js';
 
 const Select = forwardRef(function Select(
-  { label, error, options = [], className, id, children, ...props },
+  { label, error, hint, options = [], className, id, children, ...props },
   ref
 ) {
   const generatedId = useId();
@@ -36,7 +36,11 @@ const Select = forwardRef(function Select(
         </select>
         <ChevronDown className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-500" />
       </div>
-      {error && <p className="mt-1.5 text-xs text-danger-400">{error}</p>}
+      {error ? (
+        <p className="mt-1.5 text-xs text-danger-400">{error}</p>
+      ) : (
+        hint && <p className="mt-1.5 text-xs text-ink-500">{hint}</p>
+      )}
     </div>
   );
 });

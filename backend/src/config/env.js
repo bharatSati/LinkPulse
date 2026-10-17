@@ -16,6 +16,8 @@ const env = {
   ipHashSalt: process.env.IP_HASH_SALT || process.env.JWT_SECRET,
   groqApiKey: process.env.GROQ_API_KEY || '',
   groqModel: process.env.GROQ_MODEL || 'llama-3.1-8b-instant',
+  importMaxFileMb: Number.parseInt(process.env.IMPORT_MAX_FILE_MB, 10) || 2,
+  importMaxRows: Number.parseInt(process.env.IMPORT_MAX_ROWS, 10) || 1000,
 };
 
 export function getMissingEnv() {

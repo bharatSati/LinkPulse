@@ -60,9 +60,13 @@ export function resolveRange(query = {}) {
   return { from, to, days };
 }
 
-function buildScope({ workspaceId, linkId }) {
+function buildScope({ workspaceId, linkId, linkIds }) {
   const scope = { workspace: toObjectId(workspaceId) };
-  if (linkId) scope.link = toObjectId(linkId);
+  if (linkId) {
+    scope.link = toObjectId(linkId);
+  } else if (Array.isArray(linkIds)) {
+    scope.link = { $in: linkIds.map(toObjectId) };
+  }
   return scope;
 }
 
@@ -102,8 +106,8 @@ function fillSeries(range, interval, byKey) {
   return points;
 }
 
-export async function getOverview({ workspaceId, linkId, range }) {
-  const scope = buildScope({ workspaceId, linkId });
+export async function getOverview({ workspaceId, linkId, linkIds, range }) {
+  const scope = buildScope({ workspaceId, linkId, linkIds });
   const periodMatch = withRange(scope, range);
 
   const duration = range.to.getTime() - range.from.getTime();
@@ -125,7 +129,11 @@ export async function getOverview({ workspaceId, linkId, range }) {
       ]),
       ClickEvent.countDocuments({ ...periodMatch, country: { $ne: null } }),
       ClickEvent.countDocuments({ ...periodMatch, referrerDomain: { $ne: null } }),
-      linkId ? Promise.resolve(1) : Link.countDocuments({ workspace: toObjectId(workspaceId) }),
+      linkId
+        ? Promise.resolve(1)
+        : Array.isArray(linkIds)
+          ? Promise.resolve(linkIds.length)
+          : Link.countDocuments({ workspace: toObjectId(workspaceId) }),
     ]);
 
   const uniqueVisitors = uniqueAgg[0]?.count || 0;
@@ -154,8 +162,8 @@ export async function getOverview({ workspaceId, linkId, range }) {
   };
 }
 
-export async function getClicksOverTime({ workspaceId, linkId, range, interval = 'day' }) {
-  const match = withRange(buildScope({ workspaceId, linkId }), range);
+export async function getClicksOverTime({ workspaceId, linkId, linkIds, range, interval = 'day' }) {
+  const match = withRange(buildScope({ workspaceId, linkId, linkIds }), range);
   const resolvedInterval = interval === 'hour' && range.days <= 31 ? 'hour' : 'day';
   const format = resolvedInterval === 'hour' ? '%Y-%m-%dT%H:00:00Z' : '%Y-%m-%d';
 
@@ -181,8 +189,8 @@ export async function getClicksOverTime({ workspaceId, linkId, range, interval =
   return { interval: resolvedInterval, points: fillSeries(range, resolvedInterval, byKey) };
 }
 
-export async function getTopLinks({ workspaceId, range, limit = 10 }) {
-  const match = withRange(buildScope({ workspaceId }), range);
+export async function getTopLinks({ workspaceId, linkIds, range, limit = 10 }) {
+  const match = withRange(buildScope({ workspaceId, linkIds }), range);
 
   const rows = await ClickEvent.aggregate([
     { $match: match },
@@ -217,8 +225,8 @@ export async function getTopLinks({ workspaceId, range, limit = 10 }) {
   }));
 }
 
-export async function getReferrers({ workspaceId, linkId, range, limit = 10 }) {
-  const match = withRange(buildScope({ workspaceId, linkId }), range);
+export async function getReferrers({ workspaceId, linkId, linkIds, range, limit = 10 }) {
+  const match = withRange(buildScope({ workspaceId, linkId, linkIds }), range);
 
   const rows = await ClickEvent.aggregate([
     { $match: match },
@@ -239,8 +247,8 @@ export async function getReferrers({ workspaceId, linkId, range, limit = 10 }) {
   };
 }
 
-export async function getDevices({ workspaceId, linkId, range }) {
-  const match = withRange(buildScope({ workspaceId, linkId }), range);
+export async function getDevices({ workspaceId, linkId, linkIds, range }) {
+  const match = withRange(buildScope({ workspaceId, linkId, linkIds }), range);
 
   const rows = await ClickEvent.aggregate([
     { $match: match },
@@ -260,8 +268,8 @@ export async function getDevices({ workspaceId, linkId, range }) {
   };
 }
 
-export async function getBrowsers({ workspaceId, linkId, range }) {
-  const match = withRange(buildScope({ workspaceId, linkId }), range);
+export async function getBrowsers({ workspaceId, linkId, linkIds, range }) {
+  const match = withRange(buildScope({ workspaceId, linkId, linkIds }), range);
 
   const [browserRows, osRows] = await Promise.all([
     ClickEvent.aggregate([
@@ -296,8 +304,8 @@ export async function getBrowsers({ workspaceId, linkId, range }) {
   };
 }
 
-export async function getLocations({ workspaceId, linkId, range, limit = 50 }) {
-  const match = withRange(buildScope({ workspaceId, linkId }), range);
+export async function getLocations({ workspaceId, linkId, linkIds, range, limit = 50 }) {
+  const match = withRange(buildScope({ workspaceId, linkId, linkIds }), range);
 
   const [rows, unknownClicks] = await Promise.all([
     ClickEvent.aggregate([

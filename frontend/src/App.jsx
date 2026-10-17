@@ -8,6 +8,7 @@ import Register from './pages/Register.jsx';
 import Overview from './pages/Overview.jsx';
 import Links from './pages/Links.jsx';
 import Campaigns from './pages/Campaigns.jsx';
+import CampaignDetail from './pages/CampaignDetail.jsx';
 import Analytics from './pages/Analytics.jsx';
 import QrCodes from './pages/QrCodes.jsx';
 import BioPages from './pages/BioPages.jsx';
@@ -33,6 +34,7 @@ export default function App() {
           <Route index element={<Overview />} />
           <Route path="links" element={<Links />} />
           <Route path="campaigns" element={<Campaigns />} />
+          <Route path="campaigns/:id" element={<CampaignDetail />} />
           <Route path="analytics" element={<Analytics />} />
           <Route path="qr-codes" element={<QrCodes />} />
           <Route path="bio-pages" element={<BioPages />} />

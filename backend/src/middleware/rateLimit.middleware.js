@@ -29,3 +29,9 @@ export const passwordAttemptLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   max: 20,
 });
+
+export const importLimiter = rateLimit({
+  ...standardOptions,
+  windowMs: 60 * 60 * 1000,
+  max: 30,
+});

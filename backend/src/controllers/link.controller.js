@@ -21,6 +21,8 @@ export const list = asyncHandler(async (req, res) => {
     workspaceId: req.workspace.id,
     filter: req.query.filter,
     search: req.query.search,
+    campaignId: req.query.campaignId,
+    tagId: req.query.tagId,
     page: req.query.page,
     limit: req.query.limit,
   });

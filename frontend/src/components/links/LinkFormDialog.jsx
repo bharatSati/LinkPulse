@@ -3,8 +3,10 @@ import { ChevronDown, Lock, Sparkles } from 'lucide-react';
 import Dialog from '../ui/Dialog.jsx';
 import Button from '../ui/Button.jsx';
 import Input from '../ui/Input.jsx';
+import Select from '../ui/Select.jsx';
 import Switch from '../ui/Switch.jsx';
 import Badge from '../ui/Badge.jsx';
+import TagInput from '../tags/TagInput.jsx';
 import { cn } from '../../utils/cn.js';
 import { toDateTimeLocal } from '../../utils/format.js';
 import { isHttpUrl, isValidAlias } from '../../utils/linkDisplay.js';
@@ -12,7 +14,7 @@ import { createLink, updateLink } from '../../services/link.service.js';
 
 const EMPTY_RULES = { enabled: false, defaultUrl: '', mobile: '', tablet: '', desktop: '' };
 
-function initialForm(link) {
+function initialForm(link, defaultCampaignId = '') {
   if (!link) {
     return {
       originalUrl: '',
@@ -22,6 +24,8 @@ function initialForm(link) {
       clickLimit: '',
       password: '',
       clearPassword: false,
+      campaign: defaultCampaignId || '',
+      tags: [],
       rules: { ...EMPTY_RULES },
     };
   }
@@ -34,6 +38,8 @@ function initialForm(link) {
     clickLimit: link.clickLimit ?? '',
     password: '',
     clearPassword: false,
+    campaign: link.campaign?.id || '',
+    tags: (link.tags || []).map((tag) => tag.id),
     rules: {
       enabled: Boolean(link.redirectRules?.enabled),
       defaultUrl: link.redirectRules?.defaultUrl || '',
@@ -49,9 +55,20 @@ function destinationError(value) {
   return isHttpUrl(value) ? null : 'Must be a valid http:// or https:// URL';
 }
 
-export default function LinkFormDialog({ open, mode, link, workspaceId, onClose, onSaved }) {
+export default function LinkFormDialog({
+  open,
+  mode,
+  link,
+  workspaceId,
+  campaigns = [],
+  tags = [],
+  defaultCampaignId = '',
+  onCreateTag,
+  onClose,
+  onSaved,
+}) {
   const isEdit = mode === 'edit';
-  const [form, setForm] = useState(() => initialForm(link));
+  const [form, setForm] = useState(() => initialForm(link, defaultCampaignId));
   const [errors, setErrors] = useState({});
   const [formError, setFormError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -59,12 +76,12 @@ export default function LinkFormDialog({ open, mode, link, workspaceId, onClose,
 
   useEffect(() => {
     if (open) {
-      setForm(initialForm(link));
+      setForm(initialForm(link, defaultCampaignId));
       setErrors({});
       setFormError('');
       setAdvancedOpen(Boolean(link?.redirectRules?.enabled));
     }
-  }, [open, link]);
+  }, [open, link, defaultCampaignId]);
 
   function setField(field, value) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -127,6 +144,8 @@ export default function LinkFormDialog({ open, mode, link, workspaceId, onClose,
     const payload = {
       originalUrl: form.originalUrl.trim(),
       title: form.title.trim(),
+      campaign: form.campaign || null,
+      tags: form.tags,
       redirectRules: {
         enabled: form.rules.enabled,
         defaultUrl: form.rules.defaultUrl.trim() || null,
@@ -235,6 +254,26 @@ export default function LinkFormDialog({ open, mode, link, workspaceId, onClose,
             error={errors.customAlias}
             hint="Optional. Uses letters, numbers, - and _"
             onChange={(event) => setField('customAlias', event.target.value)}
+          />
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Select
+            label="Campaign"
+            value={form.campaign}
+            onChange={(event) => setField('campaign', event.target.value)}
+            options={[
+              { value: '', label: 'No campaign' },
+              ...campaigns.map((item) => ({ value: item.id, label: item.name })),
+            ]}
+          />
+          <TagInput
+            label="Tags"
+            value={form.tags}
+            tags={tags}
+            onCreate={onCreateTag}
+            onChange={(next) => setField('tags', next)}
+            hint="Press Enter to add or create a tag."
           />
         </div>
 

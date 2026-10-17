@@ -4,10 +4,55 @@ import Link from '../models/Link.js';
 import { isValidHttpUrl, normalizeUrl, isValidAlias, normalizeAlias } from '../utils/url.js';
 import { generateUniqueCode } from '../utils/shortCode.js';
 import { hashLinkPassword } from '../utils/linkPassword.js';
+import Campaign from '../models/Campaign.js';
+import { resolveTagIds } from './tag.service.js';
+import { isValidObjectId } from '../utils/validators.js';
 
 const STATUSES = ['active', 'disabled'];
 const MAX_CLICK_LIMIT = 100000000;
 const MAX_PAGE_SIZE = 100;
+
+const POPULATE = [
+  { path: 'campaign', select: 'name status' },
+  { path: 'tags', select: 'name key' },
+];
+
+async function resolveCampaignId(workspaceId, value) {
+  if (value === undefined) return undefined;
+  if (value === null || value === '' || value === 'none') return null;
+  if (!isValidObjectId(value)) {
+    throw ApiError.badRequest('Invalid campaign id');
+  }
+
+  const campaign = await Campaign.findOne({ _id: value, workspace: workspaceId });
+  if (!campaign) {
+    throw ApiError.badRequest('Campaign does not belong to this workspace');
+  }
+
+  return campaign._id;
+}
+
+function serializeCampaignRef(campaign) {
+  if (!campaign) return null;
+  if (typeof campaign === 'object' && campaign._id) {
+    return {
+      id: String(campaign._id),
+      name: campaign.name || '',
+      status: campaign.status || null,
+    };
+  }
+  return { id: String(campaign), name: '', status: null };
+}
+
+function serializeTags(tags) {
+  if (!Array.isArray(tags)) return [];
+  return tags.map((tag) => {
+    if (tag && typeof tag === 'object' && tag._id) {
+      return { id: String(tag._id), name: tag.name || '', key: tag.key || '' };
+    }
+    return { id: String(tag), name: '', key: '' };
+  });
+}
 
 function codeIsTaken(code) {
   return Link.exists({ $or: [{ shortCode: code }, { customAlias: code }] });
@@ -122,10 +167,18 @@ export function serializeLink(link) {
     clickLimit: value.clickLimit ?? null,
     expiresAt,
     hasPassword: Boolean(value.password),
+    campaign: serializeCampaignRef(value.campaign),
+    tags: serializeTags(value.tags),
     redirectRules: value.redirectRules || {
       enabled: false,
       defaultUrl: null,
       devices: { mobile: null, tablet: null, desktop: null },
+    },
+    qr: {
+      fgColor: value.qr?.fgColor || '#000000',
+      bgColor: value.qr?.bgColor || '#ffffff',
+      size: value.qr?.size || 320,
+      errorCorrectionLevel: value.qr?.errorCorrectionLevel || 'M',
     },
     isExpired: Boolean(expiresAt && expiresAt.getTime() <= now),
     isLimitReached: value.clickLimit != null && (value.clickCount || 0) >= value.clickLimit,
@@ -154,6 +207,11 @@ export async function createLink({ workspaceId, ownerId, input }) {
   const clickLimit = parseClickLimit(input?.clickLimit);
   const redirectRules = normalizeRedirectRules(input?.redirectRules);
   const password = input?.password ? hashLinkPassword(String(input.password)) : null;
+  const campaign = await resolveCampaignId(
+    workspaceId,
+    input?.campaign !== undefined ? input.campaign : input?.campaignId
+  );
+  const tags = await resolveTagIds({ workspaceId, userId: ownerId, tags: input?.tags });
 
   const shortCode = await generateUniqueCode(codeIsTaken);
 
@@ -168,9 +226,12 @@ export async function createLink({ workspaceId, ownerId, input }) {
       expiresAt: expiresAt ?? null,
       clickLimit: clickLimit ?? null,
       password,
+      campaign: campaign ?? null,
+      tags: tags ?? [],
       redirectRules: redirectRules ?? undefined,
     });
 
+    await link.populate(POPULATE);
     return link;
   } catch (error) {
     if (error.code === 11000) {
@@ -180,7 +241,15 @@ export async function createLink({ workspaceId, ownerId, input }) {
   }
 }
 
-export async function listLinks({ workspaceId, filter = 'all', search = '', page = 1, limit = 10 }) {
+export async function listLinks({
+  workspaceId,
+  filter = 'all',
+  search = '',
+  campaignId,
+  tagId,
+  page = 1,
+  limit = 10,
+}) {
   const query = { workspace: workspaceId };
 
   if (filter === 'active') {
@@ -191,6 +260,24 @@ export async function listLinks({ workspaceId, filter = 'all', search = '', page
     query.expiresAt = { $ne: null, $lte: new Date() };
   } else if (filter === 'protected') {
     query.password = { $ne: null };
+  }
+
+  if (campaignId !== undefined && campaignId !== null && campaignId !== '') {
+    if (campaignId === 'none') {
+      query.campaign = null;
+    } else if (campaignId !== 'all') {
+      if (!isValidObjectId(campaignId)) {
+        throw ApiError.badRequest('Invalid campaign filter');
+      }
+      query.campaign = campaignId;
+    }
+  }
+
+  if (tagId) {
+    if (!isValidObjectId(tagId)) {
+      throw ApiError.badRequest('Invalid tag filter');
+    }
+    query.tags = tagId;
   }
 
   const term = typeof search === 'string' ? search.trim() : '';
@@ -210,6 +297,7 @@ export async function listLinks({ workspaceId, filter = 'all', search = '', page
   const [links, total] = await Promise.all([
     Link.find(query)
       .select('+password')
+      .populate(POPULATE)
       .sort({ createdAt: -1 })
       .skip((safePage - 1) * safeLimit)
       .limit(safeLimit),
@@ -228,7 +316,7 @@ export async function listLinks({ workspaceId, filter = 'all', search = '', page
 }
 
 export async function getLinkById(id) {
-  const link = await Link.findById(id).select('+password');
+  const link = await Link.findById(id).select('+password').populate(POPULATE);
   if (!link) {
     throw ApiError.notFound('Link not found');
   }
@@ -300,6 +388,20 @@ export async function updateLink(link, input) {
     if (rules) updates.redirectRules = rules;
   }
 
+  if (input?.campaign !== undefined || input?.campaignId !== undefined) {
+    const value = input.campaign !== undefined ? input.campaign : input.campaignId;
+    updates.campaign = await resolveCampaignId(link.workspace, value);
+  }
+
+  if (input?.tags !== undefined) {
+    const tags = await resolveTagIds({
+      workspaceId: link.workspace,
+      userId: link.owner,
+      tags: input.tags,
+    });
+    updates.tags = tags ?? [];
+  }
+
   Object.assign(link, updates);
 
   try {
@@ -311,6 +413,7 @@ export async function updateLink(link, input) {
     throw error;
   }
 
+  await link.populate(POPULATE);
   return link;
 }
 

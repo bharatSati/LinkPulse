@@ -1,4 +1,4 @@
-import { Copy, MousePointerClick, CalendarClock } from 'lucide-react';
+import { Copy, MousePointerClick, CalendarClock, Megaphone, Tag as TagIcon } from 'lucide-react';
 import Badge from '../ui/Badge.jsx';
 import LinkActions from './LinkActions.jsx';
 import { linkDisplayStatus, resolveShortUrl } from '../../utils/linkDisplay.js';
@@ -11,6 +11,8 @@ export default function LinkCard({
   onDelete,
   onCopy,
   onViewAnalytics,
+  onViewCampaign,
+  onShowQr,
   busy,
 }) {
   const status = linkDisplayStatus(link);
@@ -35,6 +37,8 @@ export default function LinkCard({
           onDelete={onDelete}
           onCopy={onCopy}
           onViewAnalytics={onViewAnalytics}
+          onViewCampaign={onViewCampaign}
+          onShowQr={onShowQr}
         />
       </div>
 
@@ -69,6 +73,31 @@ export default function LinkCard({
           {link.expiresAt ? formatDate(link.expiresAt) : formatDate(link.createdAt)}
         </span>
       </div>
+
+      {(link.campaign?.id || link.tags?.length > 0) && (
+        <div className="flex flex-wrap items-center gap-2 border-t border-base-800 pt-3">
+          {link.campaign?.id && (
+            <button
+              type="button"
+              onClick={() => onViewCampaign?.(link)}
+              className="inline-flex max-w-full items-center gap-1.5 truncate rounded-full border border-accent-600/40 bg-accent-500/10 px-2.5 py-0.5 text-[11px] text-accent-300 transition hover:bg-accent-500/20"
+              title={link.campaign.name}
+            >
+              <Megaphone className="h-3 w-3 shrink-0" />
+              <span className="truncate">{link.campaign.name}</span>
+            </button>
+          )}
+          {link.tags?.map((tag) => (
+            <span
+              key={tag.id}
+              className="inline-flex items-center gap-1 rounded-full border border-base-600 bg-base-800 px-2 py-0.5 text-[11px] text-ink-300"
+            >
+              <TagIcon className="h-2.5 w-2.5 text-accent-400" />
+              {tag.name}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

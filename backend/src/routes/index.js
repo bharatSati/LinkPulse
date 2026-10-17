@@ -4,6 +4,8 @@ import authRoutes from './auth.routes.js';
 import workspaceRoutes from './workspace.routes.js';
 import linkRoutes from './link.routes.js';
 import analyticsRoutes from './analytics.routes.js';
+import campaignRoutes from './campaign.routes.js';
+import tagRoutes from './tag.routes.js';
 
 const router = Router();
 
@@ -12,5 +14,7 @@ router.use('/auth', authRoutes);
 router.use('/workspaces', workspaceRoutes);
 router.use('/links', linkRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/campaigns', campaignRoutes);
+router.use('/tags', tagRoutes);
 
 export default router;

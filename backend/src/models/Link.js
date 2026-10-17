@@ -30,6 +30,20 @@ const redirectRulesSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const qrSchema = new mongoose.Schema(
+  {
+    fgColor: { type: String, default: '#000000', trim: true, maxlength: 9 },
+    bgColor: { type: String, default: '#ffffff', trim: true, maxlength: 9 },
+    size: { type: Number, default: 320, min: 64, max: 1024 },
+    errorCorrectionLevel: {
+      type: String,
+      enum: ['L', 'M', 'Q', 'H'],
+      default: 'M',
+    },
+  },
+  { _id: false }
+);
+
 const linkSchema = new mongoose.Schema(
   {
     originalUrl: {
@@ -97,8 +111,24 @@ const linkSchema = new mongoose.Schema(
       default: null,
       select: false,
     },
+    campaign: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Campaign',
+      default: null,
+      index: true,
+    },
+    tags: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Tag',
+      },
+    ],
     redirectRules: {
       type: redirectRulesSchema,
+      default: () => ({}),
+    },
+    qr: {
+      type: qrSchema,
       default: () => ({}),
     },
   },
@@ -121,6 +151,8 @@ linkSchema.index(
 );
 linkSchema.index({ workspace: 1, createdAt: -1 });
 linkSchema.index({ owner: 1, createdAt: -1 });
+linkSchema.index({ workspace: 1, campaign: 1 });
+linkSchema.index({ workspace: 1, tags: 1 });
 
 linkSchema.methods.isExpired = function isExpired(now = new Date()) {
   return Boolean(this.expiresAt && this.expiresAt.getTime() <= now.getTime());
