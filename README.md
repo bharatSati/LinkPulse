@@ -81,7 +81,7 @@ The API starts on `http://localhost:5000` and exposes the health check at
 | `JWT_SECRET`    | Secret used to sign JWTs                           | `a-long-random-string`               |
 | `JWT_EXPIRES_IN`| JWT lifetime                                       | `7d`                                 |
 | `FRONTEND_URL`  | Allowed CORS origin                                | `http://localhost:5173`              |
-| `BACKEND_URL`   | Public base URL of the API                          | `http://localhost:5000`              |
+| `BACKEND_URL`   | Public base URL of the API used to build short links and QR codes. On Render it can be omitted (`RENDER_EXTERNAL_URL` is used automatically). | `http://localhost:5000` |
 | `IP_HASH_SALT`  | Salt for hashing visitor IPs (falls back to `JWT_SECRET`) | `a-long-random-string`         |
 | `IMPORT_MAX_FILE_MB` | Maximum CSV upload size in megabytes          | `2`                                  |
 | `IMPORT_MAX_ROWS`    | Maximum rows accepted in a single CSV import  | `1000`                               |

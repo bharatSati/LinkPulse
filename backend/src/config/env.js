@@ -15,7 +15,14 @@ const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
-  backendUrl: process.env.BACKEND_URL || 'http://localhost:5000',
+  // Public origin used to build short links and QR codes. On Render,
+  // RENDER_EXTERNAL_URL is injected automatically, so short links stay correct
+  // even when BACKEND_URL is not set explicitly.
+  backendUrl: (
+    process.env.BACKEND_URL ||
+    process.env.RENDER_EXTERNAL_URL ||
+    'http://localhost:5000'
+  ).replace(/\/+$/, ''),
   ipHashSalt: process.env.IP_HASH_SALT || process.env.JWT_SECRET,
   groqApiKey: process.env.GROQ_API_KEY || '',
   groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
