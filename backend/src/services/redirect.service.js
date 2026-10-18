@@ -14,7 +14,6 @@ export const LINK_STATE = {
 const UNLOCK_SCOPE = 'link-unlock';
 const UNLOCK_TTL_SECONDS = 300;
 
-export const UNLOCK_COOKIE = 'lp_unlock';
 export const UNLOCK_TTL = UNLOCK_TTL_SECONDS;
 
 export async function findLinkByCode(code) {

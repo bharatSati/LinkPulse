@@ -1,4 +1,3 @@
-import env from '../config/env.js';
 import asyncHandler from '../utils/asyncHandler.js';
 import { successResponse } from '../utils/ApiResponse.js';
 import { detectDevice } from '../utils/device.js';
@@ -6,7 +5,6 @@ import { verifyLinkPassword } from '../utils/linkPassword.js';
 import { renderErrorPage, renderPasswordPage } from '../utils/redirectPages.js';
 import {
   LINK_STATE,
-  UNLOCK_COOKIE,
   UNLOCK_TTL,
   createUnlockToken,
   evaluateLink,
@@ -27,25 +25,7 @@ function wantsJson(req) {
   return accept.includes('application/json') && !accept.includes('text/html');
 }
 
-function readCookie(req, name) {
-  const header = req.headers.cookie;
-  if (!header) return null;
-
-  for (const part of header.split(';')) {
-    const index = part.indexOf('=');
-    if (index === -1) continue;
-    const key = part.slice(0, index).trim();
-    if (key === name) {
-      return decodeURIComponent(part.slice(index + 1).trim());
-    }
-  }
-  return null;
-}
-
 function isUnlocked(req, link) {
-  const cookieToken = readCookie(req, UNLOCK_COOKIE);
-  if (verifyUnlockToken(cookieToken, link.id)) return true;
-
   const queryToken = typeof req.query?.token === 'string' ? req.query.token : null;
   return verifyUnlockToken(queryToken, link.id);
 }
@@ -197,22 +177,25 @@ export const handleUnlock = asyncHandler(async (req, res) => {
     );
   }
 
-  const token = createUnlockToken(link.id);
-
   if (wantsJson(req)) {
+    const token = createUnlockToken(link.id);
     return successResponse(res, {
       message: 'Password accepted',
       data: { token, expiresIn: UNLOCK_TTL },
     });
   }
 
-  res.cookie(UNLOCK_COOKIE, token, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: env.isProduction,
-    maxAge: UNLOCK_TTL * 1000,
-    path: '/',
-  });
+  const updated = await recordSuccessfulClick({ link, req });
 
-  return res.redirect(303, `/${encodeURIComponent(code)}`);
+  if (!updated) {
+    const refreshed = evaluateLink(await findLinkByCode(code));
+    return sendState(res, req, refreshed.state, code);
+  }
+
+  await evaluateClickSpike({ link: updated });
+
+  const device = detectDevice(req.headers['user-agent']);
+  const destination = resolveDestination(updated, device);
+
+  return res.redirect(303, destination);
 });
