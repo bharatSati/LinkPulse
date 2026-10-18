@@ -315,10 +315,11 @@ browsers (`404` not found, `403` disabled, `410` expired, `429` limit reached) a
 API clients that send `Accept: application/json` (or `?format=json`).
 
 **Passwords.** A protected link shows a password page. On success the server issues a
-short-lived (5 minute), signed unlock token as an `httpOnly` cookie and redirects — the
-password is never placed in a URL or logged. JSON clients receive the token in the response
-and may pass it back as `?token=...`. Link passwords are hashed with `scrypt`; account
-passwords remain development-only plain text (see below).
+short-lived (5 minute), signed unlock token and redirects to the destination. The token is
+single-visit: it is not stored on the device, so every fresh click on the link asks for the
+password again. The password itself is never placed in a URL or logged. JSON clients receive
+the token in the response and may pass it back as `?token=...`. Link passwords are hashed
+with `scrypt`; account passwords remain development-only plain text (see below).
 
 **Redirect rules.** Links may define optional device rules (`mobile`, `tablet`, `desktop`)
 plus a default fallback. If a matching rule exists it is used; otherwise the fallback is

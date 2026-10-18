@@ -177,25 +177,14 @@ export const handleUnlock = asyncHandler(async (req, res) => {
     );
   }
 
+  const token = createUnlockToken(link.id);
+
   if (wantsJson(req)) {
-    const token = createUnlockToken(link.id);
     return successResponse(res, {
       message: 'Password accepted',
       data: { token, expiresIn: UNLOCK_TTL },
     });
   }
 
-  const updated = await recordSuccessfulClick({ link, req });
-
-  if (!updated) {
-    const refreshed = evaluateLink(await findLinkByCode(code));
-    return sendState(res, req, refreshed.state, code);
-  }
-
-  await evaluateClickSpike({ link: updated });
-
-  const device = detectDevice(req.headers['user-agent']);
-  const destination = resolveDestination(updated, device);
-
-  return res.redirect(303, destination);
+  return res.redirect(303, `/${encodeURIComponent(code)}?token=${encodeURIComponent(token)}`);
 });
