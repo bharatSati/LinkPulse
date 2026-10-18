@@ -1,15 +1,47 @@
-import { cloneElement, useEffect, useRef, useState } from 'react';
+import { cloneElement, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '../../utils/cn.js';
 
 export default function Dropdown({ trigger, children, align = 'right', className }) {
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
   const containerRef = useRef(null);
+  const menuRef = useRef(null);
+
+  const updatePosition = useCallback(() => {
+    const triggerEl = containerRef.current;
+    if (!triggerEl) return;
+
+    const rect = triggerEl.getBoundingClientRect();
+    const menuEl = menuRef.current;
+    const menuWidth = menuEl?.offsetWidth ?? 192;
+    const menuHeight = menuEl?.offsetHeight ?? 0;
+    const gap = 8;
+    const margin = 8;
+
+    let left = align === 'right' ? rect.right - menuWidth : rect.left;
+    left = Math.min(Math.max(margin, left), Math.max(margin, window.innerWidth - menuWidth - margin));
+
+    let top = rect.bottom + gap;
+    if (menuHeight && top + menuHeight > window.innerHeight - margin) {
+      const above = rect.top - gap - menuHeight;
+      top = above >= margin ? above : Math.max(margin, window.innerHeight - menuHeight - margin);
+    }
+
+    setPosition({ top, left });
+  }, [align]);
+
+  useLayoutEffect(() => {
+    if (open) updatePosition();
+  }, [open, updatePosition]);
 
   useEffect(() => {
+    if (!open) return undefined;
+
     function onPointerDown(event) {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setOpen(false);
-      }
+      const inTrigger = containerRef.current?.contains(event.target);
+      const inMenu = menuRef.current?.contains(event.target);
+      if (!inTrigger && !inMenu) setOpen(false);
     }
     function onKeyDown(event) {
       if (event.key === 'Escape') setOpen(false);
@@ -17,11 +49,15 @@ export default function Dropdown({ trigger, children, align = 'right', className
 
     document.addEventListener('mousedown', onPointerDown);
     document.addEventListener('keydown', onKeyDown);
+    window.addEventListener('resize', updatePosition);
+    window.addEventListener('scroll', updatePosition, true);
     return () => {
       document.removeEventListener('mousedown', onPointerDown);
       document.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('scroll', updatePosition, true);
     };
-  }, []);
+  }, [open, updatePosition]);
 
   const triggerNode = cloneElement(trigger, {
     onClick: (event) => {
@@ -33,22 +69,27 @@ export default function Dropdown({ trigger, children, align = 'right', className
   });
 
   return (
-    <div ref={containerRef} className="relative inline-block">
-      {triggerNode}
-      {open && (
-        <div
-          role="menu"
-          className={cn(
-            'absolute z-50 mt-2 min-w-[12rem] animate-slide-up overflow-hidden rounded-xl border border-base-700 bg-base-850 p-1 shadow-panel',
-            align === 'right' ? 'right-0' : 'left-0',
-            className
-          )}
-          onClick={() => setOpen(false)}
-        >
-          {children}
-        </div>
-      )}
-    </div>
+    <>
+      <div ref={containerRef} className="relative inline-block">
+        {triggerNode}
+      </div>
+      {open &&
+        createPortal(
+          <div
+            ref={menuRef}
+            role="menu"
+            style={{ position: 'fixed', top: position.top, left: position.left }}
+            className={cn(
+              'z-50 min-w-[12rem] animate-slide-up overflow-hidden rounded-xl border border-base-700 bg-base-850 p-1 shadow-panel',
+              className
+            )}
+            onClick={() => setOpen(false)}
+          >
+            {children}
+          </div>,
+          document.body
+        )}
+    </>
   );
 }
 

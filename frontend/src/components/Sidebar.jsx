@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { X } from 'lucide-react';
 import Logo from './ui/Logo.jsx';
 import { NAV_SECTIONS } from '../config/navigation.js';
@@ -24,7 +24,9 @@ export default function Sidebar({ open, onClose }) {
         )}
       >
         <div className="flex h-16 items-center justify-between border-b border-base-800 px-5">
-          <Logo />
+          <Link to="/" aria-label="Go to LinkPulse home" onClick={onClose}>
+            <Logo />
+          </Link>
           <button
             type="button"
             onClick={onClose}

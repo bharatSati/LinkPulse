@@ -77,7 +77,7 @@ export default function Landing() {
           <div className="absolute inset-0 grid-noise opacity-40" aria-hidden="true" />
           <PerspectiveGrid />
 
-          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-16 px-4 pb-52 pt-16 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:pb-64 lg:pt-24">
+          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-16 px-4 pb-52 pt-16 lg:grid-cols-[1fr_1.12fr] lg:px-8 lg:pb-64 lg:pt-24">
             <div>
               <span className="inline-flex items-center border-2 border-accent-700 bg-accent-500/10 px-3 py-1.5 text-[11px] uppercase tracking-[0.25em] text-accent-300">
                 URL shortener · QR · Bio pages · Analytics
@@ -117,7 +117,7 @@ export default function Landing() {
               </ul>
             </div>
 
-            <div className="relative mx-auto aspect-square w-full max-w-md">
+            <div className="relative mx-auto aspect-square w-full max-w-lg lg:max-w-2xl">
               <WireframeObject className="h-full w-full" />
 
               <div

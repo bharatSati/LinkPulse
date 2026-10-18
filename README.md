@@ -143,9 +143,11 @@ pages, AI insights, team permissions, and security — with a purpose and a "why
 for each, plus flagship deep-dives, a "why LinkPulse" section, a how-it-works flow, and a
 security band.
 
-The page leans into the theme with interactive 3D: a rotating wireframe globe rendered on a
-`<canvas>` (`components/landing/WireframeObject.jsx`) with a glowing core, orbiting tick
-rings, animated data arcs with travelling packets, and drifting particles; mouse-tilted depth
+The page leans into the theme with interactive 3D: a large rotating wireframe globe that fills
+the hero's right column, rendered on a `<canvas>` (`components/landing/WireframeObject.jsx`) with
+a glowing core, orbiting tick rings, animated data arcs with travelling packets, and drifting
+particles — sized so the whole composition stays inside the canvas bounds (nothing is clipped at
+the edges); mouse-tilted depth
 cards (`components/landing/TiltCard.jsx`); and a perspective grid floor
 (`components/landing/PerspectiveGrid.jsx`). Copy and feature data live in
 `frontend/src/config/landingContent.js`. The canvas loop is frame-rate independent,

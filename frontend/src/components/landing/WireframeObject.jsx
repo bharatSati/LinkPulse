@@ -2,6 +2,8 @@ import { useEffect, useRef } from 'react';
 
 const TWO_PI = Math.PI * 2;
 
+const FIT_RADIUS = 1.36;
+
 const LIME = [205, 242, 63];
 const CITRUS = [255, 210, 31];
 const NODE = [242, 255, 184];
@@ -138,8 +140,8 @@ export default function WireframeObject({ className }) {
     const sphereLat = LATITUDES.map((lat) => latRing(lat, 60));
     const sphereLon = LONGITUDES.map((lon) => lonRing(lon, 48));
     const orbits = [
-      { ring: orbitRing(1.5, 76, 96), dash: false, alpha: 0.55 },
-      { ring: orbitRing(1.78, 20, 96), dash: true, alpha: 0.32 },
+      { ring: orbitRing(1.3, 76, 96), dash: false, alpha: 0.55 },
+      { ring: orbitRing(1.12, 20, 96), dash: true, alpha: 0.32 },
     ];
     const arcs = ARC_PAIRS.map(([i, j], index) => ({
       points: buildArc(ARC_NODES[i], ARC_NODES[j], 0.28),
@@ -155,7 +157,7 @@ export default function WireframeObject({ className }) {
       const y = 1 - (index / 45) * 2;
       const radius = Math.sqrt(Math.max(0, 1 - y * y));
       const theta = index * 2.399963;
-      const dist = 1.15 + ((index * 37) % 40) / 100;
+      const dist = 1.02 + ((index * 37) % 26) / 100;
       return [Math.cos(theta) * radius * dist, y * dist, Math.sin(theta) * radius * dist];
     });
 
@@ -279,7 +281,7 @@ export default function WireframeObject({ className }) {
       ctx.clearRect(0, 0, width, height);
       const cx = width / 2;
       const cy = height / 2;
-      const scale = Math.min(width, height) * 0.3;
+      const scale = ((Math.min(width, height) * 0.5) / FIT_RADIUS) * 0.98;
 
       const saveAngleY = angleY;
       angleY = tiltY;
