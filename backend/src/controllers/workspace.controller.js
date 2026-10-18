@@ -190,7 +190,7 @@ export const createInvitation = asyncHandler(async (req, res) => {
     );
   }
 
-  const { invitation, inviteUrl } = await invitationService.createInvitation({
+  const { invitation, inviteUrl, emailSent } = await invitationService.createInvitation({
     workspace: req.workspace,
     email: req.validated.email,
     role: req.validated.role,
@@ -198,15 +198,19 @@ export const createInvitation = asyncHandler(async (req, res) => {
     actorRole: req.workspaceRole,
   });
 
-  const emailSent = emailDeliveryAvailable();
   const data = { invitation, emailSent };
-  if (!emailSent) data.inviteUrl = inviteUrl;
+  if (!emailSent) {
+    data.inviteUrl = inviteUrl;
+    data.emailConfigured = emailDeliveryAvailable();
+  }
 
   return successResponse(res, {
     statusCode: 201,
     message: emailSent
       ? 'Invitation sent successfully'
-      : 'Invitation created. Email delivery is not configured, so share the invite link manually.',
+      : emailDeliveryAvailable()
+        ? 'Invitation created, but the email could not be sent. Share the invite link manually.'
+        : 'Invitation created. Email delivery is not configured, so share the invite link manually.',
     data,
   });
 });
@@ -216,20 +220,24 @@ export const resendInvitation = asyncHandler(async (req, res) => {
     throw new ApiError(503, 'Email delivery is not configured, so invitations cannot be sent.');
   }
 
-  const { invitation, inviteUrl } = await invitationService.resendInvitation({
+  const { invitation, inviteUrl, emailSent } = await invitationService.resendInvitation({
     workspaceId: req.workspace.id,
     invitationId: req.params.invitationId,
     actor: req.user.id,
   });
 
-  const emailSent = emailDeliveryAvailable();
   const data = { invitation, emailSent };
-  if (!emailSent) data.inviteUrl = inviteUrl;
+  if (!emailSent) {
+    data.inviteUrl = inviteUrl;
+    data.emailConfigured = emailDeliveryAvailable();
+  }
 
   return successResponse(res, {
     message: emailSent
       ? 'Invitation resent successfully'
-      : 'Invitation refreshed. Email delivery is not configured, so share the invite link manually.',
+      : emailDeliveryAvailable()
+        ? 'Invitation refreshed, but the email could not be sent. Share the invite link manually.'
+        : 'Invitation refreshed. Email delivery is not configured, so share the invite link manually.',
     data,
   });
 });

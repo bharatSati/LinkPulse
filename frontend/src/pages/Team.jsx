@@ -61,7 +61,7 @@ const ROLE_TONES = {
   viewer: 'neutral',
 };
 
-function InviteLinkBox({ url, onCopied }) {
+function InviteLinkBox({ url, configured = true, onCopied }) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
@@ -95,8 +95,9 @@ function InviteLinkBox({ url, onCopied }) {
         </Button>
       </div>
       <p className="mt-2 text-[11px] text-ink-500">
-        Email delivery is not configured, so no email was sent. Share the link with the invitee
-        directly.
+        {configured
+          ? "We couldn't send the email. Share the link with the invitee directly."
+          : 'Email delivery is not configured, so no email was sent. Share the link with the invitee directly.'}
       </p>
     </div>
   );
@@ -129,6 +130,7 @@ export default function Team() {
   const [inviteError, setInviteError] = useState('');
   const [inviting, setInviting] = useState(false);
   const [latestInviteUrl, setLatestInviteUrl] = useState('');
+  const [latestInviteConfigured, setLatestInviteConfigured] = useState(true);
 
   const [removeTarget, setRemoveTarget] = useState(null);
   const [removing, setRemoving] = useState(false);
@@ -180,6 +182,7 @@ export default function Team() {
     setInviteForm({ email: '', role: defaultRole });
     setInviteError('');
     setLatestInviteUrl('');
+    setLatestInviteConfigured(true);
     setInviteOpen(true);
   }
 
@@ -201,6 +204,7 @@ export default function Team() {
         result.emailSent ? 'Invitation sent' : 'Invitation created — copy the link to share'
       );
       if (result.inviteUrl) setLatestInviteUrl(result.inviteUrl);
+      setLatestInviteConfigured(result.emailConfigured !== false);
       setInviteForm((current) => ({ ...current, email: '' }));
       reload();
     } catch (err) {
@@ -214,8 +218,11 @@ export default function Team() {
     setBusyId(invitation.id);
     try {
       const result = await resendInvitation(workspaceId, invitation.id);
-      toast.success('Invitation refreshed — copy the link to share');
+      toast.success(
+        result.emailSent ? 'Invitation resent' : 'Invitation refreshed — copy the link to share'
+      );
       if (result.inviteUrl) setLatestInviteUrl(result.inviteUrl);
+      setLatestInviteConfigured(result.emailConfigured !== false);
       reload();
     } catch (err) {
       toast.error(err.message || 'Unable to resend invitation');
@@ -447,7 +454,11 @@ export default function Team() {
 
           {latestInviteUrl && (
             <div className="border-b border-base-800 p-5">
-              <InviteLinkBox url={latestInviteUrl} onCopied={() => toast.success('Link copied')} />
+              <InviteLinkBox
+                url={latestInviteUrl}
+                configured={latestInviteConfigured}
+                onCopied={() => toast.success('Link copied')}
+              />
             </div>
           )}
 
@@ -587,7 +598,11 @@ export default function Team() {
             }))}
           />
           {latestInviteUrl && (
-            <InviteLinkBox url={latestInviteUrl} onCopied={() => toast.success('Link copied')} />
+            <InviteLinkBox
+              url={latestInviteUrl}
+              configured={latestInviteConfigured}
+              onCopied={() => toast.success('Link copied')}
+            />
           )}
         </form>
       </Dialog>

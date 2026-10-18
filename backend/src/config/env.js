@@ -30,7 +30,17 @@ const env = {
   importMaxFileMb: Number.parseInt(process.env.IMPORT_MAX_FILE_MB, 10) || 2,
   importMaxRows: Number.parseInt(process.env.IMPORT_MAX_ROWS, 10) || 1000,
   invitationTtlDays: Number.parseInt(process.env.INVITATION_TTL_DAYS, 10) || 7,
-  emailDeliveryConfigured: Boolean(process.env.EMAIL_DELIVERY_CONFIGURED === 'true'),
+  // Transactional email via SMTP (Nodemailer). Delivery is only considered
+  // configured when an SMTP host and a sender address are both present, so the
+  // flag can never claim emails are sending when they are not.
+  smtpHost: process.env.SMTP_HOST || '',
+  smtpPort: Number.parseInt(process.env.SMTP_PORT, 10) || 587,
+  smtpSecure: process.env.SMTP_SECURE === 'true',
+  smtpUser: process.env.SMTP_USER || '',
+  smtpPass: process.env.SMTP_PASS || '',
+  mailFrom: process.env.MAIL_FROM || '',
+  mailReplyTo: process.env.MAIL_REPLY_TO || '',
+  emailDeliveryConfigured: Boolean(process.env.SMTP_HOST && process.env.MAIL_FROM),
 };
 
 export function isAiConfigured() {

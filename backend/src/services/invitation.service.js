@@ -9,6 +9,7 @@ import { assignableRoles } from '../utils/permissions.js';
 import { runInTransaction } from '../utils/transaction.js';
 import { recordAudit } from './audit.service.js';
 import { createNotification } from './notification.service.js';
+import { sendInvitationEmail } from './mail.service.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -64,6 +65,28 @@ function serializeInvitation(invitation) {
 function buildInviteUrl(token) {
   const base = (env.frontendUrl || '').replace(/\/+$/, '');
   return `${base}/invite/${token}`;
+}
+
+/*
+ * Best-effort invitation email delivery. A failed send never breaks the
+ * invitation itself — the invite link is still returned so it can be shared
+ * manually. Returns whether the email was actually handed to the provider.
+ */
+async function deliverInvitationEmail({ email, inviteUrl, workspaceName, inviterName, role, expiresAt }) {
+  try {
+    const { sent } = await sendInvitationEmail({
+      to: email,
+      inviteUrl,
+      workspaceName,
+      inviterName,
+      role,
+      expiresAt,
+    });
+    return sent;
+  } catch (error) {
+    console.error('[mail] Failed to send invitation email:', error.message);
+    return false;
+  }
 }
 
 async function assertAssignableRole(actorRole, role) {
@@ -146,7 +169,17 @@ export async function createInvitation({ workspace, email, role, actor, actorRol
     'name email'
   );
 
-  return { invitation: serializeInvitation(populated), token, inviteUrl: buildInviteUrl(token) };
+  const inviteUrl = buildInviteUrl(token);
+  const emailSent = await deliverInvitationEmail({
+    email: normalizedEmail,
+    inviteUrl,
+    workspaceName: workspace.name,
+    inviterName: populated.invitedBy?.name,
+    role,
+    expiresAt,
+  });
+
+  return { invitation: serializeInvitation(populated), token, inviteUrl, emailSent };
 }
 
 export async function listInvitations({ workspaceId }) {
@@ -260,9 +293,9 @@ export async function resendInvitation({ workspaceId, invitationId, actor }) {
     metadata: { role: invitation.role, resendCount: invitation.resendCount },
   });
 
+  const workspace = await Workspace.findById(workspaceId).select('name');
   const invitee = await User.findOne({ email: invitation.email });
   if (invitee) {
-    const workspace = await Workspace.findById(workspaceId).select('name');
     await createNotification({
       recipient: invitee.id,
       workspace: workspaceId,
@@ -276,7 +309,23 @@ export async function resendInvitation({ workspaceId, invitationId, actor }) {
   }
 
   await invitation.populate('invitedBy', 'name email');
-  return { invitation: serializeInvitation(invitation), token, inviteUrl: buildInviteUrl(token) };
+
+  const inviteUrl = buildInviteUrl(token);
+  const emailSent = await deliverInvitationEmail({
+    email: invitation.email,
+    inviteUrl,
+    workspaceName: workspace?.name,
+    inviterName: invitation.invitedBy?.name,
+    role: invitation.role,
+    expiresAt: invitation.expiresAt,
+  });
+
+  return {
+    invitation: serializeInvitation(invitation),
+    token,
+    inviteUrl,
+    emailSent,
+  };
 }
 
 export async function previewInvitation(token) {

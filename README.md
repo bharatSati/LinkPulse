@@ -93,7 +93,13 @@ The API starts on `http://localhost:5000` and exposes the health check at
 | `AI_QUESTION_MAX_LENGTH` | Maximum accepted natural-language question length | `300`                           |
 | `GROQ_BASE_URL` | Optional override of the Groq API base URL (proxies/self-hosting). Read natively by `groq-sdk`. | `https://api.groq.com` |
 | `INVITATION_TTL_DAYS` | Days a workspace invitation token stays valid before expiring | `7` |
-| `EMAIL_DELIVERY_CONFIGURED` | Set to `true` once transactional email delivery is wired up. When `false`, invite links are returned in the API response for manual sharing. | `false` |
+| `SMTP_HOST` | SMTP server host for invitation emails (Nodemailer). Delivery is disabled when empty. | `smtp.gmail.com` |
+| `SMTP_PORT` | SMTP port | `587` |
+| `SMTP_SECURE` | `true` for implicit TLS (port 465), `false` for STARTTLS | `false` |
+| `SMTP_USER` | SMTP username (omit for unauthenticated local servers like Mailpit) | `you@gmail.com` |
+| `SMTP_PASS` | SMTP password / app password | `****` |
+| `MAIL_FROM` | Sender address for invitation emails | `LinkPulse <no-reply@yourdomain.com>` |
+| `MAIL_REPLY_TO` | Optional reply-to address for invitation emails | *(empty)* |
 | `SECURITY_EVENT_RETENTION_DAYS` | Days security events are retained (TTL index) | `90` |
 | `NOTIFICATION_RETENTION_DAYS` | Days notifications are retained (TTL index) | `180` |
 | `ABUSE_AUTO_DISABLE` | Allow rules to disable a link automatically (never triggered by traffic volume alone) | `false` |
@@ -625,11 +631,21 @@ Rules enforced on the backend:
 
 ### Email delivery
 
-Transactional email is not wired up yet. When `EMAIL_DELIVERY_CONFIGURED=false` (the default),
-invitations are still created and the invite link is returned in the API response so an admin can
-share it manually — the response explicitly reports `emailSent: false` and the UI says no email
-was sent. In production, creating an invitation without email delivery configured returns
-`503`. Set `EMAIL_DELIVERY_CONFIGURED=true` once delivery is implemented.
+Invitation emails are sent over SMTP with [Nodemailer](https://nodemailer.com). Delivery is
+configured only when **both** `SMTP_HOST` and `MAIL_FROM` are set, so the API can never report an
+email as sent when it is not. Pick any SMTP provider (Gmail, Amazon SES, Mailgun, Postmark, your
+own server). For Gmail, enable 2-Step Verification and use a 16-character **App Password** as
+`SMTP_PASS`.
+
+For local development, run a mail catcher such as [Mailpit](https://github.com/axllent/mailpit)
+(`docker run -p 1025:1025 -p 8025:8025 axllent/mailpit`), set `SMTP_HOST=localhost`, `SMTP_PORT=1025`,
+`MAIL_FROM="LinkPulse <no-reply@local.test>"`, and view messages at `http://localhost:8025`.
+
+When email delivery is not configured, invitations are still created and the invite link is
+returned in the API response so an admin can share it manually — the response explicitly reports
+`emailSent: false` and the UI says no email was sent. In production, creating an invitation without
+email delivery configured returns `503`. If the provider rejects a send, the invitation is still
+created, `emailSent` is `false`, and the invite link is returned for manual sharing.
 
 ### Workspace settings, overview & audit
 
