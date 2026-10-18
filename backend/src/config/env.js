@@ -17,6 +17,11 @@ const env = {
   groqApiKey: process.env.GROQ_API_KEY || '',
   groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
   groqTimeoutMs: Number.parseInt(process.env.GROQ_TIMEOUT_MS, 10) || 20000,
+  // Bounded retries against the same model. Total attempts (first try included)
+  // is capped so we never hammer the provider with unlimited requests.
+  groqMaxAttempts: Math.min(Math.max(Number.parseInt(process.env.GROQ_MAX_ATTEMPTS, 10) || 3, 1), 5),
+  groqRetryBaseMs: Number.parseInt(process.env.GROQ_RETRY_BASE_MS, 10) || 600,
+  groqRetryMaxMs: Number.parseInt(process.env.GROQ_RETRY_MAX_MS, 10) || 4000,
   aiInsightsTtlMs: Number.parseInt(process.env.AI_INSIGHTS_TTL_MINUTES, 10)
     ? Number.parseInt(process.env.AI_INSIGHTS_TTL_MINUTES, 10) * 60 * 1000
     : 30 * 60 * 1000,

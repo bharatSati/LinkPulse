@@ -469,6 +469,13 @@ async function findLatest(workspaceId, kind) {
 const CONFIG_NOTICE =
   'AI-generated insights are not available because GROQ_API_KEY is not configured on the server. Rule-based anomaly detection is shown instead.';
 
+function aiErrorNotice(error) {
+  return (
+    error?.userMessage ||
+    'Something went wrong while generating AI content. Please try again.'
+  );
+}
+
 /* ------------------------------------------------------------------ *
  * Public API
  * ------------------------------------------------------------------ */
@@ -551,7 +558,7 @@ export async function getInsights({ workspaceId, range, refresh = false }) {
         configured: true,
         dataChanged: latest.dataSignature !== signature,
         suggestedQuestions: questions,
-        notice: `${error.message} Showing the most recently saved insights.`,
+        notice: `${aiErrorNotice(error)} Showing the most recently saved insights.`,
       };
     }
     return {
@@ -562,7 +569,7 @@ export async function getInsights({ workspaceId, range, refresh = false }) {
       metrics,
       anomalies: anomalies.map((item) => ({ ...item, detectedAt: new Date().toISOString() })),
       items: [],
-      notice: `${error.message} Rule-based anomaly detection is shown instead.`,
+      notice: `${aiErrorNotice(error)} Rule-based anomaly detection is shown instead.`,
       generatedAt: new Date().toISOString(),
       source: 'rules',
       cached: false,
@@ -675,7 +682,7 @@ export async function getRecommendations({ workspaceId, range, refresh = false }
         items: (latest.items || []).map(serializeItem),
         anomalies: (latest.anomalies || []).map(serializeAnomaly),
         generatedAt: latest.generatedAt.toISOString(),
-        notice: `${error.message} Showing the most recently saved recommendations.`,
+        notice: `${aiErrorNotice(error)} Showing the most recently saved recommendations.`,
         source: 'cache',
         cached: true,
         stale: true,
@@ -690,7 +697,7 @@ export async function getRecommendations({ workspaceId, range, refresh = false }
       items: [],
       anomalies: anomalies.map((item) => ({ ...item, detectedAt: new Date().toISOString() })),
       generatedAt: new Date().toISOString(),
-      notice: error.message,
+      notice: aiErrorNotice(error),
       source: 'rules',
       cached: false,
       stale: false,
@@ -741,7 +748,7 @@ export async function ask({ workspaceId, range, question }) {
       available: false,
       configured: true,
       generatedAt: new Date().toISOString(),
-      notice: error.message,
+      notice: aiErrorNotice(error),
     };
   }
 }
