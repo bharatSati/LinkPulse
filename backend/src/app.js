@@ -18,6 +18,24 @@ app.use(
   helmet({
     referrerPolicy: { policy: 'no-referrer' },
     crossOriginResourcePolicy: { policy: 'same-site' },
+    contentSecurityPolicy: {
+      directives: {
+        ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+        // The short-link pages are served from this origin but may be reached
+        // over http and/or viewed through a proxy origin, so allow the public
+        // backend/frontend origins explicitly. Otherwise the form submit can be
+        // blocked by `form-action 'self'` once `upgrade-insecure-requests`
+        // rewrites the action to https.
+        'form-action': ["'self'", env.backendUrl, env.frontendUrl],
+        // The password page pulls its favicon from the frontend origin.
+        'img-src': ["'self'", 'data:', env.frontendUrl],
+        // `upgrade-insecure-requests` rewrites relative form actions to https,
+        // which no longer match `form-action 'self'` on an http document and
+        // silently blocks the unlock POST. HTTPS is already enforced by the
+        // host (Render 301 + HSTS), so this directive is redundant here.
+        'upgrade-insecure-requests': null,
+      },
+    },
   })
 );
 app.use(

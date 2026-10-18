@@ -118,7 +118,7 @@ export const handleRedirect = asyncHandler(async (req, res) => {
     }
     return res
       .status(200)
-      .send(renderPasswordPage({ code, title: link.title, error: null }));
+      .send(renderPasswordPage({ code, title: link.title, error: null, nonce: res.locals.cspNonce }));
   }
 
   if (state !== LINK_STATE.OK && state !== LINK_STATE.PASSWORD_REQUIRED) {
@@ -173,6 +173,7 @@ export const handleUnlock = asyncHandler(async (req, res) => {
         code,
         title: link.title,
         error: 'Incorrect password. Please try again.',
+        nonce: res.locals.cspNonce,
       })
     );
   }

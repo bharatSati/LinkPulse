@@ -175,8 +175,9 @@ export function renderErrorPage({ status, title, message, code }) {
   return layout({ title, body });
 }
 
-export function renderPasswordPage({ code, title, error }) {
+export function renderPasswordPage({ code, title, error, nonce = '' }) {
   const heading = title ? `"${escapeHtml(title)}" is protected` : 'This link is protected';
+  const nonceAttr = nonce ? ` nonce="${escapeHtml(nonce)}"` : '';
   const body = `
     <div class="icon">${LOCK_ICON}</div>
     <h1>${heading}</h1>
@@ -195,7 +196,7 @@ export function renderPasswordPage({ code, title, error }) {
     <p class="footer">Powered by <a href="${escapeHtml(
       (env.frontendUrl || '').replace(/\/+$/, '') || '#'
     )}">LinkPulse</a></p>
-    <script>
+    <script${nonceAttr}>
       (function () {
         var toggle = document.querySelector('.pw-toggle');
         var input = document.getElementById('password');
