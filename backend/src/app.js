@@ -35,7 +35,13 @@ app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(sanitizeRequest);
 
 if (env.nodeEnv !== 'test') {
-  app.use(morgan(env.isProduction ? 'combined' : 'dev'));
+  // Only log server errors (5xx). Successful requests and expected client
+  // errors (4xx) are intentionally silent to keep the console quiet.
+  app.use(
+    morgan(env.isProduction ? 'combined' : 'dev', {
+      skip: (req, res) => res.statusCode < 500,
+    })
+  );
 }
 
 app.use('/api/v1', apiLimiter, routes);

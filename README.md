@@ -85,6 +85,7 @@ The API starts on `http://localhost:5000` and exposes the health check at
 | `IP_HASH_SALT`  | Salt for hashing visitor IPs (falls back to `JWT_SECRET`) | `a-long-random-string`         |
 | `IMPORT_MAX_FILE_MB` | Maximum CSV upload size in megabytes          | `2`                                  |
 | `IMPORT_MAX_ROWS`    | Maximum rows accepted in a single CSV import  | `1000`                               |
+| `LOG_LEVEL`     | Console verbosity: `error`, `warn`, `info`, `debug`. Only startup and real errors show at the default `info`; successful requests are never logged. | `info` |
 | `GROQ_API_KEY`  | Groq API key. AI features are disabled (rule-based insights only) when empty | `gsk_...`             |
 | `GROQ_MODEL`    | Groq chat model used for generation                | `llama-3.3-70b-versatile`            |
 | `GROQ_TIMEOUT_MS` | Per-request timeout for Groq calls               | `20000`                              |

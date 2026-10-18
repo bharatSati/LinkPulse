@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import security from '../config/security.js';
+import logger from '../utils/logger.js';
 import SecurityEvent from '../models/SecurityEvent.js';
 import AbuseReport from '../models/AbuseReport.js';
 import Link from '../models/Link.js';
@@ -138,7 +139,7 @@ async function recordEvent({
     );
   } catch (error) {
     if (error.code !== 11000) {
-      console.error('[abuse] Failed to record security event:', error.message);
+      logger.debug('[abuse] Failed to record security event:', error.message);
     }
     return null;
   }
@@ -220,7 +221,7 @@ export async function evaluateLinkCreation({ workspaceId, link }) {
 
     return events;
   } catch (error) {
-    console.error('[abuse] Link creation evaluation failed:', error.message);
+    logger.debug('[abuse] Link creation evaluation failed:', error.message);
     return [];
   }
 }
@@ -268,7 +269,7 @@ export async function evaluateClickSpike({ link }) {
       dedupeKey: `spike:${link._id}:${bucket(windowMs)}`,
     });
   } catch (error) {
-    console.error('[abuse] Click spike evaluation failed:', error.message);
+    logger.debug('[abuse] Click spike evaluation failed:', error.message);
     return null;
   }
 }
@@ -303,7 +304,7 @@ export async function evaluateSourceBurst({ link, req }) {
       dedupeKey: `srcburst:${ipHash}:${bucket(windowMs)}`,
     });
   } catch (error) {
-    console.error('[abuse] Source burst evaluation failed:', error.message);
+    logger.debug('[abuse] Source burst evaluation failed:', error.message);
     return null;
   }
 }
@@ -335,7 +336,7 @@ export async function evaluatePasswordFailure({ link }) {
       dedupeKey: `pwfail:${link._id}:${bucket(windowMs)}`,
     });
   } catch (error) {
-    console.error('[abuse] Password failure evaluation failed:', error.message);
+    logger.debug('[abuse] Password failure evaluation failed:', error.message);
     return null;
   }
 }

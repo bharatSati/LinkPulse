@@ -1,5 +1,6 @@
 import env from '../config/env.js';
 import ApiError from '../utils/ApiError.js';
+import logger from '../utils/logger.js';
 
 export function notFoundHandler(req, res, next) {
   next(ApiError.notFound(`Route not found: ${req.method} ${req.originalUrl}`));
@@ -26,7 +27,7 @@ export function errorHandler(err, req, res, next) {
   }
 
   if (statusCode >= 500) {
-    console.error('[error]', err.stack || err.message);
+    logger.error('[error]', err.stack || err.message);
   }
 
   if (res.headersSent) {

@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import env, { isAiConfigured } from '../config/env.js';
 import ApiError from '../utils/ApiError.js';
+import logger from '../utils/logger.js';
 import Campaign from '../models/Campaign.js';
 import Link from '../models/Link.js';
 import AiInsight from '../models/AiInsight.js';
@@ -358,7 +359,7 @@ async function notifyAnomalies(workspaceId, anomalies) {
       data: { priority: top.priority, subtype: top.subtype },
     });
   } catch (error) {
-    console.error('[ai] Anomaly notification skipped:', error.message);
+    logger.debug('[ai] Anomaly notification skipped:', error.message);
   }
 }
 

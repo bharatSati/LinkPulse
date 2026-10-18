@@ -1,4 +1,5 @@
 import AuditLog, { AUDIT_ACTIONS } from '../models/AuditLog.js';
+import logger from '../utils/logger.js';
 
 const SENSITIVE_KEY = /(token|password|secret|apikey|api_key|hash|credential)/i;
 const MAX_STRING = 300;
@@ -73,7 +74,7 @@ export async function recordAudit({
     return log;
   } catch (error) {
     if (process.env.NODE_ENV !== 'test') {
-      console.error(`Audit log skipped (${action}):`, error.message);
+      logger.debug(`Audit log skipped (${action}):`, error.message);
     }
     return null;
   }

@@ -1,6 +1,7 @@
 import Link from '../models/Link.js';
 import ClickEvent from '../models/ClickEvent.js';
 import { detectDevice } from '../utils/device.js';
+import logger from '../utils/logger.js';
 import { parseUserAgent } from '../utils/userAgent.js';
 import { parseReferrer } from '../utils/referrer.js';
 import { detectGeo } from '../utils/geo.js';
@@ -66,7 +67,7 @@ export async function recordSuccessfulClick({ link, req }) {
   try {
     await ClickEvent.create(buildClickEvent(updated, req));
   } catch (error) {
-    console.error('[tracking] Failed to persist click event:', error.message);
+    logger.debug('[tracking] Failed to persist click event:', error.message);
   }
 
   return updated;

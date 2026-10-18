@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import env from './env.js';
+import logger from '../utils/logger.js';
 
 const STATE_LABELS = {
   0: 'disconnected',
@@ -20,18 +21,18 @@ export async function connectDatabase() {
   mongoose.set('strictQuery', true);
 
   mongoose.connection.on('error', (error) => {
-    console.error('[db] MongoDB connection error:', error.message);
+    logger.error('[db] MongoDB connection error:', error.message);
   });
 
   mongoose.connection.on('disconnected', () => {
-    console.warn('[db] MongoDB disconnected');
+    logger.warn('[db] MongoDB disconnected');
   });
 
   try {
     await mongoose.connect(env.mongodbUri, {
       serverSelectionTimeoutMS: 10000,
     });
-    console.log('[db] MongoDB connected');
+    logger.info('[db] MongoDB connected');
   } catch (error) {
     throw new Error(`Unable to connect to MongoDB at "${env.mongodbUri}": ${error.message}`);
   }
@@ -39,5 +40,5 @@ export async function connectDatabase() {
 
 export async function disconnectDatabase() {
   await mongoose.connection.close();
-  console.log('[db] MongoDB connection closed');
+  logger.info('[db] MongoDB connection closed');
 }

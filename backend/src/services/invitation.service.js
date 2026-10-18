@@ -1,5 +1,6 @@
 import crypto from 'node:crypto';
 import ApiError from '../utils/ApiError.js';
+import logger from '../utils/logger.js';
 import Workspace from '../models/Workspace.js';
 import User from '../models/User.js';
 import WorkspaceInvitation from '../models/WorkspaceInvitation.js';
@@ -84,7 +85,7 @@ async function deliverInvitationEmail({ email, inviteUrl, workspaceName, inviter
     });
     return sent;
   } catch (error) {
-    console.error('[mail] Failed to send invitation email:', error.message);
+    logger.warn('[mail] Failed to send invitation email:', error.message);
     return false;
   }
 }

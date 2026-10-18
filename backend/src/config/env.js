@@ -7,6 +7,9 @@ const required = ['MONGODB_URI', 'JWT_SECRET'];
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   isProduction: (process.env.NODE_ENV || 'development') === 'production',
+  // Console verbosity: error | warn | info | debug. Default keeps startup and
+  // real errors only; set LOG_LEVEL=debug to see per-request and background noise.
+  logLevel: (process.env.LOG_LEVEL || 'info').toLowerCase(),
   port: Number.parseInt(process.env.PORT, 10) || 5000,
   mongodbUri: process.env.MONGODB_URI,
   jwtSecret: process.env.JWT_SECRET,

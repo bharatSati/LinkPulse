@@ -1,5 +1,6 @@
 import Notification from '../models/Notification.js';
 import Workspace from '../models/Workspace.js';
+import logger from '../utils/logger.js';
 
 const MAX_PAGE_SIZE = 50;
 
@@ -75,7 +76,7 @@ export async function createNotification({
     return notification;
   } catch (error) {
     if (error.code !== 11000) {
-      console.error('[notifications] Failed to create notification:', error.message);
+      logger.debug('[notifications] Failed to create notification:', error.message);
     }
     return null;
   }

@@ -1,6 +1,7 @@
 import Groq from 'groq-sdk';
 import env, { isAiConfigured } from '../config/env.js';
 import { parseJsonLoose } from '../utils/ai.js';
+import logger from '../utils/logger.js';
 
 export class AiError extends Error {
   constructor(code, message, userMessage) {
@@ -199,7 +200,7 @@ export async function requestJson({ system, user, maxTokens = 1200, temperature 
 
       const canRetry = isRetryable(error) && attempt < attempts - 1;
       if (canRetry) {
-        console.warn(
+        logger.debug(
           `[ai] attempt ${attempt + 1}/${attempts} failed (${mapped.code}); retrying the same model`
         );
         continue;
