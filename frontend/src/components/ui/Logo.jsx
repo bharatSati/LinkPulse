@@ -6,7 +6,7 @@ export default function Logo({ className, showText = true }) {
     <div className={cn('flex items-center gap-2.5', className)}>
       <span className="relative flex h-9 w-9 items-center justify-center border-2 border-accent-500 bg-base-850 shadow-glow">
         <Activity className="h-5 w-5 text-accent-400" />
-        <span className="absolute -right-1 -top-1 h-1.5 w-1.5 bg-neon-400" />
+        <span className="absolute -right-1 -top-1 h-1.5 w-1.5 bg-citrus-400" />
       </span>
       {showText && (
         <span className="font-display text-base font-semibold tracking-tight text-ink-100">

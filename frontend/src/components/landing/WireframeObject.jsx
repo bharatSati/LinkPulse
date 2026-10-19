@@ -4,10 +4,10 @@ const TWO_PI = Math.PI * 2;
 
 const FIT_RADIUS = 1.36;
 
-const LIME = [193, 255, 46];
-const CYAN = [34, 230, 208];
-const NODE = [234, 255, 171];
-const ORBIT = [92, 255, 232];
+const LIME = [205, 242, 63];
+const CITRUS = [255, 210, 31];
+const NODE = [242, 255, 184];
+const ORBIT = [224, 249, 110];
 
 function rotate(point, ax, ay) {
   const [x, y, z] = point;
@@ -203,9 +203,9 @@ export default function WireframeObject({ className }) {
     function drawCore(scale, cx, cy) {
       const radius = scale * 1.25;
       const gradient = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
-      gradient.addColorStop(0, 'rgba(193, 255, 46, 0.22)');
-      gradient.addColorStop(0.45, 'rgba(34, 230, 208, 0.08)');
-      gradient.addColorStop(1, 'rgba(193, 255, 46, 0)');
+      gradient.addColorStop(0, 'rgba(205, 242, 63, 0.22)');
+      gradient.addColorStop(0.45, 'rgba(255, 210, 31, 0.08)');
+      gradient.addColorStop(1, 'rgba(205, 242, 63, 0)');
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, TWO_PI);
@@ -220,14 +220,14 @@ export default function WireframeObject({ className }) {
         const sx = cx + p[0] * scale * perspective;
         const sy = cy + p[1] * scale * perspective;
         const depth = Math.max(0, Math.min(1, (p[2] + 1.8) / 3.6));
-        ctx.fillStyle = `rgba(92, 255, 232, ${(depth * 0.5).toFixed(3)})`;
+        ctx.fillStyle = `rgba(224, 249, 110, ${(depth * 0.5).toFixed(3)})`;
         ctx.fillRect(sx, sy, depth > 0.6 ? 2 : 1, depth > 0.6 ? 2 : 1);
       });
     }
 
     function drawArcs(scale, cx, cy) {
       arcs.forEach((arc) => {
-        drawPolyline(arc.points, scale, cx, cy, CYAN, LIME, 0.6, false);
+        drawPolyline(arc.points, scale, cx, cy, CITRUS, LIME, 0.6, false);
 
         if (!reduceMotion) {
           const cycle = ((clock * arc.speed + arc.offset) % 1 + 1) % 1;
@@ -242,8 +242,8 @@ export default function WireframeObject({ className }) {
           ];
           const p = project(world, scale, cx, cy);
           ctx.beginPath();
-          ctx.fillStyle = 'rgba(234, 255, 171, 0.95)';
-          ctx.shadowColor = 'rgba(34, 230, 208, 0.9)';
+          ctx.fillStyle = 'rgba(242, 255, 184, 0.95)';
+          ctx.shadowColor = 'rgba(255, 210, 31, 0.9)';
           ctx.shadowBlur = 12;
           ctx.arc(p.x, p.y, 2.6, 0, TWO_PI);
           ctx.fill();
@@ -257,8 +257,8 @@ export default function WireframeObject({ className }) {
         const p = project(node, scale, cx, cy);
         const radius = 2.2 + p.depth * 2;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(234, 255, 171, ${(0.25 + p.depth * 0.75).toFixed(3)})`;
-        ctx.shadowColor = 'rgba(193, 255, 46, 0.9)';
+        ctx.fillStyle = `rgba(242, 255, 184, ${(0.25 + p.depth * 0.75).toFixed(3)})`;
+        ctx.shadowColor = 'rgba(205, 242, 63, 0.9)';
         ctx.shadowBlur = 14 * p.depth;
         ctx.arc(p.x, p.y, radius, 0, TWO_PI);
         ctx.fill();
@@ -289,8 +289,8 @@ export default function WireframeObject({ className }) {
       drawCore(scale, cx, cy);
       drawParticles(scale, cx, cy);
 
-      sphereLat.forEach((ring) => drawPolyline(ring, scale, cx, cy, LIME, CYAN, 0.45, false));
-      sphereLon.forEach((ring) => drawPolyline(ring, scale, cx, cy, LIME, CYAN, 0.28, false));
+      sphereLat.forEach((ring) => drawPolyline(ring, scale, cx, cy, LIME, CITRUS, 0.45, false));
+      sphereLon.forEach((ring) => drawPolyline(ring, scale, cx, cy, LIME, CITRUS, 0.28, false));
 
       orbits.forEach((orbit) =>
         drawPolyline(orbit.ring, scale, cx, cy, ORBIT, ORBIT, orbit.alpha, orbit.dash)

@@ -12,10 +12,10 @@ const PULSE_LIFETIME = 4200;
 const DEFAULT_VIEW = { spin: 0.55, tiltX: -0.32, zoom: 1 };
 
 const DEVICE_COLORS = {
-  desktop: '#c1ff2e',
-  mobile: '#22e6d0',
-  tablet: '#eaffab',
-  unknown: '#7d9391',
+  desktop: '#cdf23f',
+  mobile: '#ffd21f',
+  tablet: '#f2ffb8',
+  unknown: '#9dac78',
 };
 
 function lonLatToVec(lon, lat) {
@@ -124,9 +124,9 @@ function mixHex(a, b, t) {
 }
 
 function heatColor(t) {
-  if (t <= 0) return '193, 255, 46';
-  if (t < 0.5) return mixHex('#c1ff2e', '#22e6d0', t / 0.5);
-  return mixHex('#22e6d0', '#ff5c85', (t - 0.5) / 0.5);
+  if (t <= 0) return '205, 242, 63';
+  if (t < 0.5) return mixHex('#cdf23f', '#ffd21f', t / 0.5);
+  return mixHex('#ffd21f', '#ff6b5f', (t - 0.5) / 0.5);
 }
 
 function clamp(value, min, max) {
@@ -300,9 +300,9 @@ export default function LiveGlobe({
       ctx.clearRect(0, 0, width, height);
 
       const glow = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius * 1.34);
-      glow.addColorStop(0, 'rgba(34, 230, 208, 0.12)');
-      glow.addColorStop(0.55, 'rgba(193, 255, 46, 0.04)');
-      glow.addColorStop(1, 'rgba(34, 230, 208, 0)');
+      glow.addColorStop(0, 'rgba(205, 242, 63, 0.10)');
+      glow.addColorStop(0.55, 'rgba(205, 242, 63, 0.035)');
+      glow.addColorStop(1, 'rgba(205, 242, 63, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
       ctx.arc(cx, cy, radius * 1.34, 0, TWO_PI);
@@ -312,9 +312,9 @@ export default function LiveGlobe({
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, TWO_PI);
       const ocean = ctx.createRadialGradient(cx, cy, radius * 0.05, cx, cy, radius);
-      ocean.addColorStop(0, 'rgba(20, 29, 36, 0.92)');
-      ocean.addColorStop(0.5, 'rgba(11, 18, 23, 0.96)');
-      ocean.addColorStop(1, 'rgba(4, 7, 10, 1)');
+      ocean.addColorStop(0, 'rgba(27, 35, 16, 0.92)');
+      ocean.addColorStop(0.5, 'rgba(17, 22, 10, 0.96)');
+      ocean.addColorStop(1, 'rgba(11, 14, 6, 1)');
       ctx.fillStyle = ocean;
       ctx.fill();
       ctx.clip();
@@ -324,7 +324,7 @@ export default function LiveGlobe({
 
       ctx.restore();
 
-      ctx.strokeStyle = 'rgba(193, 255, 46, 0.45)';
+      ctx.strokeStyle = 'rgba(205, 242, 63, 0.4)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, TWO_PI);
@@ -340,7 +340,7 @@ export default function LiveGlobe({
 
     function drawGraticule(project) {
       ctx.lineWidth = 1;
-      ctx.strokeStyle = 'rgba(193, 255, 46, 0.13)';
+      ctx.strokeStyle = 'rgba(205, 242, 63, 0.13)';
 
       for (const line of GRATICULE_LAT) {
         ctx.beginPath();
@@ -361,7 +361,7 @@ export default function LiveGlobe({
         ctx.stroke();
       }
 
-      ctx.strokeStyle = 'rgba(34, 230, 208, 0.1)';
+      ctx.strokeStyle = 'rgba(205, 242, 63, 0.1)';
 
       for (const line of GRATICULE_LON) {
         ctx.beginPath();
@@ -431,17 +431,17 @@ export default function LiveGlobe({
         }
 
         if (active) {
-          ctx.shadowColor = 'rgba(193, 255, 46, 0.85)';
+          ctx.shadowColor = 'rgba(205, 242, 63, 0.85)';
           ctx.shadowBlur = 12;
         }
 
         ctx.strokeStyle = isSelected
-          ? '#eaffab'
+          ? '#f2ffb8'
           : isHovered
-            ? '#d4ff5e'
+            ? '#e0f96e'
             : intensity > 0
               ? `rgba(${heatColor(intensity)}, 0.85)`
-              : 'rgba(193, 255, 46, 0.28)';
+              : 'rgba(205, 242, 63, 0.26)';
         ctx.lineWidth = isSelected ? 1.5 : isHovered ? 1.2 : 0.7;
         ctx.stroke();
         ctx.shadowBlur = 0;
@@ -455,7 +455,7 @@ export default function LiveGlobe({
       ctx.translate(cx, cy);
       ctx.rotate(still ? 0.4 : angleY * 0.5);
       ctx.setLineDash([4, 12]);
-      ctx.strokeStyle = 'rgba(34, 230, 208, 0.28)';
+      ctx.strokeStyle = 'rgba(205, 242, 63, 0.22)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(0, 0, radius * 1.12, 0, TWO_PI);
@@ -466,7 +466,7 @@ export default function LiveGlobe({
         const angle = still ? i * 2.1 : angleY * 0.5 + i * 2.1;
         const x = Math.cos(angle) * radius * 1.12;
         const y = Math.sin(angle) * radius * 1.12;
-        ctx.fillStyle = i === 0 ? '#c1ff2e' : 'rgba(34, 230, 208, 0.8)';
+        ctx.fillStyle = i === 0 ? '#cdf23f' : 'rgba(255, 210, 31, 0.7)';
         ctx.fillRect(x - 1.5, y - 1.5, 3, 3);
       }
 
@@ -521,7 +521,7 @@ export default function LiveGlobe({
         if (pulse.code && progress < 0.7) {
           ctx.globalAlpha = alpha * 0.9;
           ctx.font = '10px "JetBrains Mono", monospace';
-          ctx.fillStyle = '#eef6f5';
+          ctx.fillStyle = '#f4fce0';
           ctx.fillText(pulse.code, point.x + 9, point.y - 9);
         }
 
@@ -686,7 +686,7 @@ export default function LiveGlobe({
         className="pointer-events-none absolute inset-0 opacity-[0.25]"
         style={{
           backgroundImage:
-            'repeating-linear-gradient(0deg, rgba(193,255,46,0.06) 0px, rgba(193,255,46,0.06) 1px, transparent 1px, transparent 3px)',
+            'repeating-linear-gradient(0deg, rgba(205,242,63,0.06) 0px, rgba(205,242,63,0.06) 1px, transparent 1px, transparent 3px)',
         }}
         aria-hidden="true"
       />
@@ -704,7 +704,7 @@ export default function LiveGlobe({
         <span className="text-[9px] uppercase tracking-[0.2em] text-ink-600">low</span>
         <span
           className="h-1.5 w-16"
-          style={{ background: 'linear-gradient(90deg, rgba(193,255,46,0.25), #22e6d0, #ff5c85)' }}
+          style={{ background: 'linear-gradient(90deg, rgba(205,242,63,0.25), #ffd21f, #ff6b5f)' }}
         />
         <span className="text-[9px] uppercase tracking-[0.2em] text-ink-600">high</span>
       </div>
