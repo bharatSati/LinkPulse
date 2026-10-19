@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import ApiError from '../utils/ApiError.js';
 import ClickEvent from '../models/ClickEvent.js';
 import Link from '../models/Link.js';
+import { serializeClick } from '../utils/clickPayload.js';
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const MAX_RANGE_DAYS = 731;
@@ -430,4 +431,22 @@ export async function getLinkAnalytics({ link, range }) {
   ]);
 
   return { overview, clicksOverTime, referrers, devices, browsers, locations };
+}
+
+export async function getRecentClicks({ workspaceId, linkId = null, limit = 20 }) {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const filter = {
+    workspace: toObjectId(workspaceId),
+    timestamp: { $gte: since },
+  };
+
+  if (linkId) filter.link = toObjectId(linkId);
+
+  const rows = await ClickEvent.find(filter)
+    .sort({ timestamp: -1 })
+    .limit(clampLimit(limit, 20, 50))
+    .populate('link', 'title shortCode customAlias')
+    .lean();
+
+  return rows.map((row) => serializeClick(row, row.link));
 }

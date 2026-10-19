@@ -20,6 +20,7 @@ import EmptyState from '../components/ui/EmptyState.jsx';
 import Button from '../components/ui/Button.jsx';
 import Spinner from '../components/ui/Spinner.jsx';
 import StatCard from '../components/analytics/StatCard.jsx';
+import LivePulse from '../components/analytics/LivePulse.jsx';
 import ChartCard from '../components/analytics/ChartCard.jsx';
 import ClicksChart from '../components/analytics/ClicksChart.jsx';
 import { useAuth } from '../hooks/useAuth.js';
@@ -222,6 +223,8 @@ export default function Overview() {
               </Card>
             ))}
           </div>
+
+          <LivePulse workspaceId={workspaceId} />
 
           <ChartCard
             title="Clicks over time"

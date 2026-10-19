@@ -16,6 +16,7 @@ import Badge from '../components/ui/Badge.jsx';
 import Spinner from '../components/ui/Spinner.jsx';
 import EmptyState from '../components/ui/EmptyState.jsx';
 import StatCard from '../components/analytics/StatCard.jsx';
+import LivePulse from '../components/analytics/LivePulse.jsx';
 import ChartCard from '../components/analytics/ChartCard.jsx';
 import ClicksChart from '../components/analytics/ClicksChart.jsx';
 import DonutChart from '../components/analytics/DonutChart.jsx';
@@ -273,6 +274,8 @@ export default function Analytics() {
               loading={loading && !overview}
             />
           </div>
+
+          <LivePulse workspaceId={workspaceId} linkId={linkId} />
 
           <ChartCard
             title="Clicks over time"

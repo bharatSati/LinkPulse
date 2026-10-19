@@ -1,6 +1,8 @@
 import Link from '../models/Link.js';
 import ClickEvent from '../models/ClickEvent.js';
 import { detectDevice } from '../utils/device.js';
+import { serializeClick } from '../utils/clickPayload.js';
+import { publishClick } from './realtime.service.js';
 import logger from '../utils/logger.js';
 import { parseUserAgent } from '../utils/userAgent.js';
 import { parseReferrer } from '../utils/referrer.js';
@@ -65,7 +67,8 @@ export async function recordSuccessfulClick({ link, req }) {
   if (!updated) return null;
 
   try {
-    await ClickEvent.create(buildClickEvent(updated, req));
+    const event = await ClickEvent.create(buildClickEvent(updated, req));
+    publishClick(updated.workspace, serializeClick(event, updated));
   } catch (error) {
     logger.debug('[tracking] Failed to persist click event:', error.message);
   }
