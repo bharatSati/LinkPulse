@@ -4,6 +4,7 @@ import LandingNav from '../components/landing/LandingNav.jsx';
 import LandingFooter from '../components/landing/LandingFooter.jsx';
 import PerspectiveGrid from '../components/landing/PerspectiveGrid.jsx';
 import TiltCard from '../components/landing/TiltCard.jsx';
+import Reveal from '../components/landing/Reveal.jsx';
 import WireframeObject from '../components/landing/WireframeObject.jsx';
 import { AnalyticsVisual, BioVisual, AiVisual } from '../components/landing/LandingVisuals.jsx';
 import { useAuth } from '../hooks/useAuth.js';
@@ -77,7 +78,7 @@ export default function Landing() {
           <div className="absolute inset-0 grid-noise opacity-40" aria-hidden="true" />
           <PerspectiveGrid />
 
-          <div className="relative mx-auto grid w-full max-w-6xl items-center gap-16 px-4 pb-52 pt-16 lg:grid-cols-[1fr_1.12fr] lg:px-8 lg:pb-64 lg:pt-24">
+          <div className="stagger-children relative mx-auto grid w-full max-w-6xl items-center gap-16 px-4 pb-52 pt-16 lg:grid-cols-[1fr_1.12fr] lg:px-8 lg:pb-64 lg:pt-24">
             <div>
               <span className="inline-flex items-center border-2 border-accent-700 bg-accent-500/10 px-3 py-1.5 text-[11px] uppercase tracking-[0.25em] text-accent-300">
                 URL shortener · QR · Bio pages · Analytics
@@ -157,26 +158,30 @@ export default function Landing() {
 
         {/* Features */}
         <section id="features" className="mx-auto w-full max-w-6xl px-4 py-20 lg:px-8 lg:py-28">
-          <SectionHeading
-            eyebrow="Features"
-            title="One platform for every link you share"
-            description="Each tool solves a specific job — and they all feed the same analytics, so nothing you publish is ever a dead end."
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="Features"
+              title="One platform for every link you share"
+              description="Each tool solves a specific job — and they all feed the same analytics, so nothing you publish is ever a dead end."
+            />
+          </Reveal>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((feature) => (
-              <TiltCard key={feature.name} intensity={6} scale={1.01}>
-                <article className="surface-card flex h-full flex-col p-5">
-                  <span className="flex h-11 w-11 items-center justify-center border-2 border-base-700 bg-base-850 text-accent-400">
-                    <feature.icon className="h-5 w-5" />
-                  </span>
-                  <h3 className="mt-4 text-sm text-ink-100">{feature.name}</h3>
-                  <p className="mt-3 text-sm leading-relaxed text-ink-400">{feature.purpose}</p>
-                  <p className="mt-4 border-l-2 border-accent-600 pl-3 text-sm leading-relaxed text-ink-300">
-                    {feature.why}
-                  </p>
-                </article>
-              </TiltCard>
+            {FEATURES.map((feature, index) => (
+              <Reveal key={feature.name} delay={index * 70} className="h-full">
+                <TiltCard intensity={6} scale={1.01} className="h-full">
+                  <article className="surface-card flex h-full flex-col p-5">
+                    <span className="flex h-11 w-11 items-center justify-center border-2 border-base-700 bg-base-850 text-accent-400">
+                      <feature.icon className="h-5 w-5" />
+                    </span>
+                    <h3 className="mt-4 text-sm text-ink-100">{feature.name}</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-ink-400">{feature.purpose}</p>
+                    <p className="mt-4 border-l-2 border-accent-600 pl-3 text-sm leading-relaxed text-ink-300">
+                      {feature.why}
+                    </p>
+                  </article>
+                </TiltCard>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -193,7 +198,7 @@ export default function Landing() {
                   id={flagship.id}
                   className="grid items-center gap-14 lg:grid-cols-2"
                 >
-                  <div className={reversed ? 'lg:order-2' : ''}>
+                  <Reveal className={reversed ? 'lg:order-2' : ''}>
                     <span className="text-[11px] uppercase tracking-[0.3em] text-accent-400">
                       {flagship.eyebrow}
                     </span>
@@ -210,11 +215,11 @@ export default function Landing() {
                         </li>
                       ))}
                     </ul>
-                  </div>
+                  </Reveal>
 
-                  <div className={reversed ? 'lg:order-1' : ''}>
+                  <Reveal className={reversed ? 'lg:order-1' : ''} delay={120}>
                     <Visual />
-                  </div>
+                  </Reveal>
                 </div>
               );
             })}
@@ -223,25 +228,29 @@ export default function Landing() {
 
         {/* Why LinkPulse */}
         <section id="why" className="mx-auto w-full max-w-6xl px-4 py-20 lg:px-8 lg:py-28">
-          <SectionHeading
-            eyebrow="Why LinkPulse"
-            title="Why teams choose LinkPulse over a basic shortener"
-            description="A plain link shortener stops at the redirect. LinkPulse carries that connection all the way to insight, safety, and teamwork."
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="Why LinkPulse"
+              title="Why teams choose LinkPulse over a basic shortener"
+              description="A plain link shortener stops at the redirect. LinkPulse carries that connection all the way to insight, safety, and teamwork."
+            />
+          </Reveal>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {DIFFERENTIATORS.map((item) => (
-              <TiltCard key={item.title} intensity={7}>
-                <div className="surface-card flex h-full items-start gap-4 p-5">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-accent-700 bg-accent-500/10 text-accent-300">
-                    <item.icon className="h-5 w-5" />
-                  </span>
-                  <div>
-                    <h3 className="text-sm text-ink-100">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-ink-400">{item.body}</p>
+            {DIFFERENTIATORS.map((item, index) => (
+              <Reveal key={item.title} delay={index * 70} className="h-full">
+                <TiltCard intensity={7} className="h-full">
+                  <div className="surface-card flex h-full items-start gap-4 p-5">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center border-2 border-accent-700 bg-accent-500/10 text-accent-300">
+                      <item.icon className="h-5 w-5" />
+                    </span>
+                    <div>
+                      <h3 className="text-sm text-ink-100">{item.title}</h3>
+                      <p className="mt-2 text-sm leading-relaxed text-ink-400">{item.body}</p>
+                    </div>
                   </div>
-                </div>
-              </TiltCard>
+                </TiltCard>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -249,26 +258,30 @@ export default function Landing() {
         {/* How it works */}
         <section id="how" className="border-y-2 border-base-800 bg-base-900/40">
           <div className="mx-auto w-full max-w-6xl px-4 py-20 lg:px-8 lg:py-28">
-            <SectionHeading
-              eyebrow="How it works"
-              title="From URL to insight in three steps"
-              description="No setup marathons. Create, share, and measure — the whole loop fits in a few minutes."
-            />
+            <Reveal>
+              <SectionHeading
+                eyebrow="How it works"
+                title="From URL to insight in three steps"
+                description="No setup marathons. Create, share, and measure — the whole loop fits in a few minutes."
+              />
+            </Reveal>
 
             <div className="mt-14 grid gap-6 md:grid-cols-3">
               {STEPS.map((step, index) => (
-                <article key={step.title} className="surface-card relative p-6">
-                  <span className="font-display text-2xl text-accent-500/40">
-                    0{index + 1}
-                  </span>
-                  <div className="mt-4 flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center border-2 border-base-700 bg-base-850 text-accent-400">
-                      <step.icon className="h-5 w-5" />
+                <Reveal key={step.title} delay={index * 90} className="h-full">
+                  <article className="surface-card relative h-full p-6">
+                    <span className="font-display text-2xl text-accent-500/40">
+                      0{index + 1}
                     </span>
-                    <h3 className="text-sm text-ink-100">{step.title}</h3>
-                  </div>
-                  <p className="mt-4 text-sm leading-relaxed text-ink-400">{step.body}</p>
-                </article>
+                    <div className="mt-4 flex items-center gap-3">
+                      <span className="flex h-10 w-10 items-center justify-center border-2 border-base-700 bg-base-850 text-accent-400">
+                        <step.icon className="h-5 w-5" />
+                      </span>
+                      <h3 className="text-sm text-ink-100">{step.title}</h3>
+                    </div>
+                    <p className="mt-4 text-sm leading-relaxed text-ink-400">{step.body}</p>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -276,23 +289,27 @@ export default function Landing() {
 
         {/* Security */}
         <section id="security" className="mx-auto w-full max-w-6xl px-4 py-20 lg:px-8 lg:py-28">
-          <SectionHeading
-            eyebrow="Security"
-            title="Protection that is on by default"
-            description="Trust is a feature. Every workspace ships with the safeguards that keep your links and your audience safe."
-          />
+          <Reveal>
+            <SectionHeading
+              eyebrow="Security"
+              title="Protection that is on by default"
+              description="Trust is a feature. Every workspace ships with the safeguards that keep your links and your audience safe."
+            />
+          </Reveal>
 
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {SECURITY_POINTS.map((item) => (
-              <div key={item.title} className="flex items-start gap-4 border-2 border-base-800 p-5">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-base-700 bg-base-850 text-accent-400">
-                  <item.icon className="h-5 w-5" />
-                </span>
-                <div>
-                  <h3 className="text-sm text-ink-100">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-400">{item.body}</p>
+            {SECURITY_POINTS.map((item, index) => (
+              <Reveal key={item.title} delay={index * 70} className="h-full">
+                <div className="flex h-full items-start gap-4 border-2 border-base-800 p-5">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center border-2 border-base-700 bg-base-850 text-accent-400">
+                    <item.icon className="h-5 w-5" />
+                  </span>
+                  <div>
+                    <h3 className="text-sm text-ink-100">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-ink-400">{item.body}</p>
+                  </div>
                 </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </section>
@@ -301,7 +318,7 @@ export default function Landing() {
         <section className="relative overflow-hidden border-t-2 border-base-800">
           <div className="absolute inset-0 grid-noise opacity-40" aria-hidden="true" />
           <PerspectiveGrid />
-          <div className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-24 text-center lg:px-8 lg:py-32">
+          <Reveal className="relative mx-auto flex w-full max-w-3xl flex-col items-center px-4 py-24 text-center lg:px-8 lg:py-32">
             <h2 className="text-xl font-semibold leading-relaxed text-ink-100 lg:text-2xl">
               Start measuring every click
             </h2>
@@ -320,7 +337,7 @@ export default function Landing() {
                 Sign in
               </Link>
             </div>
-          </div>
+          </Reveal>
         </section>
       </main>
 

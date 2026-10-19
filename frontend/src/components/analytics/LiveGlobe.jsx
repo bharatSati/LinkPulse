@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { feature } from 'topojson-client';
 import worldData from 'world-atlas/countries-110m.json';
+import indiaBoundary from '../../assets/india-boundary.json';
 import { Maximize2, Minus, Pause, Play, Plus } from 'lucide-react';
 import { alpha2ForCountryName, countryCentroid, countryCode } from '../../utils/geo.js';
 
@@ -23,6 +24,16 @@ function lonLatToVec(lon, lat) {
   const cosPhi = Math.cos(phi);
   return [cosPhi * Math.sin(lambda), Math.sin(phi), cosPhi * Math.cos(lambda)];
 }
+
+function lonLatRingsToVectors(rings) {
+  return rings.map((ring) => ring.map(([lon, lat]) => lonLatToVec(lon, lat)));
+}
+
+const BOUNDARY_OVERRIDES = {
+  IN: indiaBoundary.IN,
+  PK: indiaBoundary.PK,
+  CN: indiaBoundary.CN,
+};
 
 function buildCountries() {
   const collection = feature(worldData, worldData.objects.countries);
@@ -61,6 +72,18 @@ function buildCountries() {
         screenRings: rings.map(() => []),
       });
     }
+  }
+
+  for (const country of countries) {
+    const override = country.code ? BOUNDARY_OVERRIDES[country.code] : null;
+    if (!override) continue;
+    country.rings = lonLatRingsToVectors(override);
+    country.screenRings = country.rings.map(() => []);
+  }
+
+  const indiaIndex = countries.findIndex((country) => country.code === 'IN');
+  if (indiaIndex >= 0) {
+    countries.push(countries.splice(indiaIndex, 1)[0]);
   }
 
   return countries;
@@ -276,28 +299,21 @@ export default function LiveGlobe({
 
       ctx.clearRect(0, 0, width, height);
 
-      const glow = ctx.createRadialGradient(cx, cy, radius * 0.2, cx, cy, radius * 1.35);
-      glow.addColorStop(0, 'rgba(205, 242, 63, 0.14)');
-      glow.addColorStop(0.6, 'rgba(205, 242, 63, 0.05)');
+      const glow = ctx.createRadialGradient(cx, cy, radius * 0.3, cx, cy, radius * 1.34);
+      glow.addColorStop(0, 'rgba(205, 242, 63, 0.10)');
+      glow.addColorStop(0.55, 'rgba(205, 242, 63, 0.035)');
       glow.addColorStop(1, 'rgba(205, 242, 63, 0)');
       ctx.fillStyle = glow;
       ctx.beginPath();
-      ctx.arc(cx, cy, radius * 1.35, 0, TWO_PI);
+      ctx.arc(cx, cy, radius * 1.34, 0, TWO_PI);
       ctx.fill();
 
       ctx.save();
       ctx.beginPath();
       ctx.arc(cx, cy, radius, 0, TWO_PI);
-      const ocean = ctx.createRadialGradient(
-        cx - radius * 0.3,
-        cy - radius * 0.35,
-        radius * 0.1,
-        cx,
-        cy,
-        radius * 1.05
-      );
-      ocean.addColorStop(0, 'rgba(47, 61, 28, 0.95)');
-      ocean.addColorStop(0.55, 'rgba(20, 26, 12, 0.96)');
+      const ocean = ctx.createRadialGradient(cx, cy, radius * 0.05, cx, cy, radius);
+      ocean.addColorStop(0, 'rgba(27, 35, 16, 0.92)');
+      ocean.addColorStop(0.5, 'rgba(17, 22, 10, 0.96)');
       ocean.addColorStop(1, 'rgba(11, 14, 6, 1)');
       ctx.fillStyle = ocean;
       ctx.fill();
@@ -411,7 +427,7 @@ export default function LiveGlobe({
           const rgb = heatColor(intensity);
           const alpha = active ? 0.42 : 0.1 + intensity * 0.32;
           ctx.fillStyle = `rgba(${rgb}, ${alpha.toFixed(3)})`;
-          ctx.fill();
+          ctx.fill('evenodd');
         }
 
         if (active) {

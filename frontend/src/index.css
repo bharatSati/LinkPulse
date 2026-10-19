@@ -170,6 +170,19 @@
     animation-delay: 495ms;
   }
 
+  .reveal {
+    opacity: 0;
+    transform: translateY(18px);
+    transition:
+      opacity 0.5s steps(8, end),
+      transform 0.5s steps(8, end);
+  }
+
+  .reveal-in {
+    opacity: 1;
+    transform: none;
+  }
+
   .interactive-lift {
     transition:
       transform 0.2s steps(4, end),
@@ -211,5 +224,11 @@
   .interactive-lift,
   .interactive-lift:hover {
     transform: none !important;
+  }
+
+  .reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
