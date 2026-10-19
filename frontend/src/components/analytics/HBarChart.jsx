@@ -22,7 +22,7 @@ export default function HBarChart({ data }) {
           axisLine={false}
           tickLine={false}
         />
-        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(205,242,63,0.1)' }} />
+        <Tooltip content={<ChartTooltip />} cursor={{ fill: 'rgba(193,255,46,0.1)' }} />
         <Bar dataKey="Clicks" radius={0} barSize={14}>
           {chartData.map((entry, index) => (
             <Cell key={entry.name} fill={CHART_COLORS[index % CHART_COLORS.length]} />

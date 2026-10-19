@@ -15,7 +15,7 @@ export default function PerspectiveGrid({ className }) {
           transform: 'rotateX(74deg)',
           transformOrigin: 'bottom center',
           backgroundImage:
-            'linear-gradient(rgba(205,242,63,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,210,31,0.22) 1px, transparent 1px)',
+            'linear-gradient(rgba(193,255,46,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(34,230,208,0.22) 1px, transparent 1px)',
           backgroundSize: '48px 48px',
           maskImage: 'linear-gradient(to top, #000 10%, transparent 82%)',
           WebkitMaskImage: 'linear-gradient(to top, #000 10%, transparent 82%)',

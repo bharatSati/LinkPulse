@@ -41,7 +41,7 @@ const DEVICE_ICONS = {
 
 const DEVICE_COLORS = {
   desktop: 'bg-accent-400',
-  mobile: 'bg-citrus-400',
+  mobile: 'bg-neon-400',
   tablet: 'bg-ink-200',
   unknown: 'bg-ink-500',
 };
@@ -262,7 +262,7 @@ export default function LivePulse({ workspaceId, linkId = null, className = '' }
                         <p className="truncate text-sm text-ink-200">{countryName(row.code)}</p>
                         <span className="mt-1 block h-1 w-full bg-base-800">
                           <span
-                            className="block h-full animate-bar-grow bg-gradient-to-r from-accent-500 to-citrus-500"
+                            className="block h-full animate-bar-grow bg-gradient-to-r from-accent-500 to-neon-500"
                             style={{ width: `${Math.max(6, (row.count / maxCountry) * 100)}%` }}
                           />
                         </span>

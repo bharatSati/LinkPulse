@@ -22,8 +22,8 @@
   body {
     @apply bg-base-950 text-ink-100 font-sans antialiased;
     background-image:
-      radial-gradient(ellipse 70% 55% at 12% -10%, rgba(205, 242, 63, 0.14), transparent 60%),
-      radial-gradient(ellipse 60% 50% at 100% 0%, rgba(255, 210, 31, 0.1), transparent 55%),
+      radial-gradient(ellipse 70% 55% at 12% -10%, rgba(193, 255, 46, 0.14), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 100% 0%, rgba(34, 230, 208, 0.12), transparent 55%),
       repeating-linear-gradient(
         0deg,
         rgba(0, 0, 0, 0.24) 0px,
@@ -33,7 +33,7 @@
       );
     background-attachment: fixed;
     letter-spacing: 0.01em;
-    text-shadow: 0 0 1px rgba(205, 242, 63, 0.2);
+    text-shadow: 0 0 1px rgba(193, 255, 46, 0.2);
   }
 
   h1,
@@ -83,7 +83,7 @@
   .surface-card {
     @apply border-2 border-base-700 bg-base-900 shadow-panel;
     background-image:
-      linear-gradient(120deg, rgba(205, 242, 63, 0.05), rgba(255, 210, 31, 0.03) 55%, transparent),
+      linear-gradient(120deg, rgba(193, 255, 46, 0.05), rgba(34, 230, 208, 0.04) 55%, transparent),
       linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 45%);
   }
 
@@ -93,8 +93,8 @@
 
   .grid-noise {
     background-image:
-      linear-gradient(rgba(205, 242, 63, 0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(205, 242, 63, 0.06) 1px, transparent 1px);
+      linear-gradient(rgba(193, 255, 46, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(34, 230, 208, 0.05) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 }
@@ -117,12 +117,12 @@
   }
 
   .text-glow {
-    text-shadow: 0 0 10px rgba(205, 242, 63, 0.6);
+    text-shadow: 0 0 10px rgba(193, 255, 46, 0.6);
   }
 
   .text-gradient {
-    color: #cdf23f;
-    background-image: linear-gradient(120deg, #f2ffb8, #cdf23f 45%, #ffd21f 95%);
+    color: #c1ff2e;
+    background-image: linear-gradient(120deg, #eaffab, #c1ff2e 45%, #22e6d0 95%);
     background-size: 200% auto;
     -webkit-background-clip: text;
     background-clip: text;
