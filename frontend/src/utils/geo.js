@@ -6,6 +6,7 @@ const COUNTRY_CENTROIDS = {
   AL: [41.2, 20.2],
   AM: [40.1, 45.0],
   AO: [-11.2, 17.9],
+  AQ: [-75.0, 0.0],
   AR: [-38.4, -63.6],
   AT: [47.5, 14.6],
   AU: [-25.3, 133.8],
@@ -61,6 +62,7 @@ const COUNTRY_CENTROIDS = {
   GD: [12.1, -61.7],
   GE: [42.3, 43.4],
   GH: [7.9, -1.0],
+  GL: [72.0, -42.0],
   GM: [13.4, -15.3],
   GN: [9.9, -9.7],
   GQ: [1.7, 10.3],
@@ -122,6 +124,7 @@ const COUNTRY_CENTROIDS = {
   MY: [4.2, 101.9],
   MZ: [-18.7, 35.5],
   NA: [-22.6, 17.1],
+  NC: [-21.3, 165.5],
   NE: [17.6, 8.1],
   NG: [9.1, 8.7],
   NI: [12.9, -85.2],
@@ -186,6 +189,7 @@ const COUNTRY_CENTROIDS = {
   VN: [14.1, 108.3],
   VU: [-15.4, 166.9],
   WS: [-13.8, -172.1],
+  XK: [42.6, 21.0],
   YE: [15.6, 48.5],
   ZA: [-30.6, 22.9],
   ZM: [-13.1, 27.8],
@@ -212,4 +216,137 @@ export function countryCentroid(code) {
 export function countryCode(code) {
   if (typeof code !== 'string') return '';
   return code.trim().toUpperCase();
+}
+
+const regionNames = (() => {
+  try {
+    return new Intl.DisplayNames(['en'], { type: 'region' });
+  } catch {
+    return null;
+  }
+})();
+
+export function countryName(code) {
+  const normalized = countryCode(code);
+  if (!normalized) return 'Unknown';
+  try {
+    return regionNames?.of(normalized) || normalized;
+  } catch {
+    return normalized;
+  }
+}
+
+const NAME_ALIASES = {
+  'united states of america': 'US',
+  'united states': 'US',
+  'russian federation': 'RU',
+  russia: 'RU',
+  'viet nam': 'VN',
+  vietnam: 'VN',
+  'korea': 'KR',
+  'republic of korea': 'KR',
+  'south korea': 'KR',
+  'dem rep korea': 'KP',
+  'north korea': 'KP',
+  'czech rep': 'CZ',
+  'czech republic': 'CZ',
+  'cote d ivoire': 'CI',
+  'ivory coast': 'CI',
+  myanmar: 'MM',
+  'myanmar burma': 'MM',
+  'lao pdr': 'LA',
+  laos: 'LA',
+  'timor leste': 'TL',
+  'east timor': 'TL',
+  'brunei darussalam': 'BN',
+  'cabo verde': 'CV',
+  'cape verde': 'CV',
+  swaziland: 'SZ',
+  eswatini: 'SZ',
+  turkiye: 'TR',
+  turkey: 'TR',
+  'bosnia and herz': 'BA',
+  'bosnia and herzegovina': 'BA',
+  'macedonia': 'MK',
+  'north macedonia': 'MK',
+  'solomon is': 'SB',
+  'dem rep congo': 'CD',
+  'democratic republic of the congo': 'CD',
+  'congo': 'CG',
+  'republic of the congo': 'CG',
+  'central african rep': 'CF',
+  'central african republic': 'CF',
+  'dominican rep': 'DO',
+  'dominican republic': 'DO',
+  'eq guinea': 'GQ',
+  'equatorial guinea': 'GQ',
+  's sudan': 'SS',
+  'south sudan': 'SS',
+  'w sahara': 'EH',
+  'western sahara': 'EH',
+  'falkland is': 'FK',
+  'fr s antarctic lands': 'TF',
+  'united kingdom': 'GB',
+  'great britain': 'GB',
+  'the bahamas': 'BS',
+  bahamas: 'BS',
+  'the gambia': 'GM',
+  gambia: 'GM',
+  'sao tome and principe': 'ST',
+  'syrian arab republic': 'SY',
+  'iran islamic republic of': 'IR',
+  'venezuela bolivarian republic of': 'VE',
+  'bolivia plurinational state of': 'BO',
+  'tanzania united republic of': 'TZ',
+  'moldova republic of': 'MD',
+  'brunei': 'BN',
+  'palestinian territory': 'PS',
+  'west bank': 'PS',
+  palestine: 'PS',
+  greenland: 'GL',
+  'new caledonia': 'NC',
+  antarctica: 'AQ',
+  kosovo: 'XK',
+  'n cyprus': 'CY',
+  'northern cyprus': 'CY',
+  somaliland: 'SO',
+  'trinidad and tobago': 'TT',
+};
+
+let nameIndex = null;
+
+function normalizeName(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function getNameIndex() {
+  if (nameIndex) return nameIndex;
+
+  const index = new Map();
+  for (const code of Object.keys(COUNTRY_CENTROIDS)) {
+    try {
+      const label = regionNames?.of(code);
+      if (label) index.set(normalizeName(label), code);
+    } catch {
+      // ignore unsupported codes
+    }
+  }
+
+  for (const [name, code] of Object.entries(NAME_ALIASES)) {
+    index.set(normalizeName(name), code);
+  }
+
+  nameIndex = index;
+  return index;
+}
+
+export function alpha2ForCountryName(name) {
+  const normalized = normalizeName(name);
+  if (!normalized) return null;
+  return getNameIndex().get(normalized) || null;
 }

@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Activity, Globe2, Monitor, Radio, Smartphone, Tablet } from 'lucide-react';
+import { Activity, Globe2, Monitor, Radio, Smartphone, Tablet, X } from 'lucide-react';
 import LiveGlobe from './LiveGlobe.jsx';
 import useLiveClicks from '../../hooks/useLiveClicks.js';
-import { countryCode } from '../../utils/geo.js';
+import { countryCode, countryName } from '../../utils/geo.js';
 
 const STATUS_STYLES = {
   idle: {
@@ -89,27 +89,67 @@ function Metric({ label, value }) {
 export default function LivePulse({ workspaceId, linkId = null, className = '' }) {
   const { clicks, status, error } = useLiveClicks({ workspaceId, linkId });
   const [now, setNow] = useState(Date.now());
+  const [tab, setTab] = useState('latest');
+  const [selectedCountry, setSelectedCountry] = useState(null);
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    setSelectedCountry(null);
+    setTab('latest');
+  }, [workspaceId, linkId]);
+
+  const countryCounts = useMemo(() => {
+    const counts = {};
+    for (const click of clicks) {
+      const code = countryCode(click.country);
+      if (!code) continue;
+      counts[code] = (counts[code] || 0) + 1;
+    }
+    return counts;
+  }, [clicks]);
+
+  const countryRows = useMemo(() => {
+    return Object.entries(countryCounts)
+      .map(([code, count]) => ({ code, count }))
+      .sort((a, b) => b.count - a.count || a.code.localeCompare(b.code));
+  }, [countryCounts]);
+
   const metrics = useMemo(() => {
     const lastMinute = clicks.filter(
       (click) => now - new Date(click.timestamp).getTime() < 60000
     );
-    const countries = new Set(clicks.map((click) => countryCode(click.country)).filter(Boolean));
 
     return {
       perMinute: lastMinute.length,
-      countries: countries.size,
+      countries: countryRows.length,
       device: topDevice(clicks),
     };
-  }, [clicks, now]);
+  }, [clicks, now, countryRows.length]);
+
+  const filteredClicks = useMemo(() => {
+    if (!selectedCountry) return clicks;
+    return clicks.filter((click) => countryCode(click.country) === selectedCountry);
+  }, [clicks, selectedCountry]);
 
   const statusStyle = STATUS_STYLES[status] || STATUS_STYLES.idle;
-  const latest = clicks.slice(0, 12);
+  const latest = filteredClicks.slice(0, 12);
+  const maxCountry = countryRows[0]?.count || 1;
+
+  function toggleCountry(code) {
+    if (!code) return;
+    setSelectedCountry((current) => (current === code ? null : code));
+  }
+
+  const tabClass = (value) =>
+    `px-3 py-1 text-[11px] uppercase tracking-[0.18em] transition ${
+      tab === value
+        ? 'border border-accent-600/60 bg-accent-500/10 text-accent-300'
+        : 'border border-transparent text-ink-500 hover:text-ink-300'
+    }`;
 
   return (
     <section className={`surface-card overflow-hidden p-0 ${className}`}>
@@ -137,9 +177,15 @@ export default function LivePulse({ workspaceId, linkId = null, className = '' }
 
       <div className="grid lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
         <div className="relative overflow-hidden border-b border-base-800 lg:border-b-0 lg:border-r">
-          <LiveGlobe key={`${workspaceId}:${linkId || 'all'}`} clicks={clicks} />
+          <LiveGlobe
+            key={`${workspaceId}:${linkId || 'all'}`}
+            clicks={clicks}
+            countryCounts={countryCounts}
+            selectedCountry={selectedCountry}
+            onSelectCountry={toggleCountry}
+          />
 
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-base-900 via-base-900/80 to-transparent px-4 pb-4 pt-10">
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-base-900 via-base-900/80 to-transparent px-4 pb-14 pt-10">
             <div className="grid grid-cols-3 gap-3">
               <Metric label="Clicks / min" value={metrics.perMinute} />
               <Metric label="Countries" value={metrics.countries} />
@@ -148,32 +194,101 @@ export default function LivePulse({ workspaceId, linkId = null, className = '' }
           </div>
         </div>
 
-        <div className="flex min-h-[280px] flex-col sm:min-h-[340px] lg:min-h-[380px]">
-          <div className="flex items-center justify-between border-b border-base-800 px-4 py-2.5">
-            <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-ink-500">
-              <Globe2 className="h-3.5 w-3.5 text-accent-400" />
-              Latest clicks
-            </p>
-            <span className="text-[11px] text-ink-600">newest first</span>
+        <div className="flex min-h-[280px] flex-col sm:min-h-[340px] lg:min-h-[400px]">
+          <div className="flex items-center justify-between gap-2 border-b border-base-800 px-4 py-2">
+            <div className="flex items-center gap-1">
+              <button type="button" onClick={() => setTab('latest')} className={tabClass('latest')}>
+                Latest
+              </button>
+              <button
+                type="button"
+                onClick={() => setTab('countries')}
+                className={tabClass('countries')}
+              >
+                Countries
+              </button>
+            </div>
+            <span className="text-[11px] text-ink-600">
+              {tab === 'latest' ? 'newest first' : `${countryRows.length} active`}
+            </span>
           </div>
+
+          {selectedCountry && (
+            <button
+              type="button"
+              onClick={() => setSelectedCountry(null)}
+              className="flex items-center justify-between gap-2 border-b border-accent-600/40 bg-accent-500/5 px-4 py-1.5 text-left transition hover:bg-accent-500/10"
+            >
+              <span className="flex items-center gap-2 text-[11px] text-accent-300">
+                <Globe2 className="h-3.5 w-3.5" />
+                Filtering: {countryName(selectedCountry)}
+              </span>
+              <X className="h-3.5 w-3.5 text-ink-400" />
+            </button>
+          )}
 
           {error ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
               <Radio className="h-6 w-6 text-danger-400" />
               <p className="text-sm text-ink-300">{error}</p>
             </div>
+          ) : tab === 'countries' ? (
+            countryRows.length === 0 ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
+                <Globe2 className="h-6 w-6 text-accent-400" />
+                <p className="text-sm text-ink-300">No geography yet.</p>
+                <p className="max-w-[16rem] text-xs text-ink-500">
+                  Country heat appears as clicks arrive.
+                </p>
+              </div>
+            ) : (
+              <ul className="max-h-[280px] flex-1 divide-y divide-base-800 overflow-y-auto sm:max-h-[340px] lg:max-h-[400px]">
+                {countryRows.slice(0, 24).map((row, index) => (
+                  <li key={row.code}>
+                    <button
+                      type="button"
+                      onClick={() => toggleCountry(row.code)}
+                      className={`flex w-full items-center gap-3 px-4 py-2 text-left transition hover:bg-base-850/60 ${
+                        selectedCountry === row.code ? 'bg-accent-500/10' : ''
+                      }`}
+                    >
+                      <span className="w-5 shrink-0 font-mono text-[11px] text-ink-600">
+                        {String(index + 1).padStart(2, '0')}
+                      </span>
+                      <span className="w-7 shrink-0 font-mono text-[11px] text-accent-400">
+                        {row.code}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm text-ink-200">{countryName(row.code)}</p>
+                        <span className="mt-1 block h-1 w-full bg-base-800">
+                          <span
+                            className="block h-full animate-bar-grow bg-gradient-to-r from-accent-500 to-citrus-500"
+                            style={{ width: `${Math.max(6, (row.count / maxCountry) * 100)}%` }}
+                          />
+                        </span>
+                      </div>
+                      <span className="shrink-0 font-mono text-[11px] text-ink-400">{row.count}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )
           ) : latest.length === 0 ? (
             <div className="flex flex-1 flex-col items-center justify-center gap-2 px-6 text-center">
               <span className="flex h-10 w-10 items-center justify-center border border-base-700 bg-base-850 text-accent-400">
                 <Radio className="h-4 w-4 animate-pulse-glow" />
               </span>
-              <p className="text-sm text-ink-300">Waiting for the next pulse.</p>
+              <p className="text-sm text-ink-300">
+                {selectedCountry ? 'No clicks from here yet.' : 'Waiting for the next pulse.'}
+              </p>
               <p className="max-w-[16rem] text-xs text-ink-500">
-                Share a short link — clicks will land here in real time.
+                {selectedCountry
+                  ? 'Clear the filter or wait for traffic from this country.'
+                  : 'Share a short link — clicks will land here in real time.'}
               </p>
             </div>
           ) : (
-            <ul className="max-h-[280px] flex-1 divide-y divide-base-800 overflow-y-auto sm:max-h-[340px] lg:max-h-[380px]">
+            <ul className="max-h-[280px] flex-1 divide-y divide-base-800 overflow-y-auto sm:max-h-[340px] lg:max-h-[400px]">
               {latest.map((click) => {
                 const DeviceIcon = DEVICE_ICONS[click.deviceType] || DEVICE_ICONS.unknown;
                 const code = countryCode(click.country) || '??';
@@ -192,7 +307,11 @@ export default function LivePulse({ workspaceId, linkId = null, className = '' }
                       />
                     </span>
 
-                    <div className="min-w-0 flex-1">
+                    <button
+                      type="button"
+                      onClick={() => toggleCountry(code)}
+                      className="min-w-0 flex-1 text-left"
+                    >
                       <p className="truncate text-sm text-ink-200">
                         {click.title || click.code || 'Short link'}
                       </p>
@@ -200,7 +319,7 @@ export default function LivePulse({ workspaceId, linkId = null, className = '' }
                         {click.code ? `/${click.code}` : 'link'} · {code}
                         {click.browser ? ` · ${click.browser}` : ''}
                       </p>
-                    </div>
+                    </button>
 
                     <span className="shrink-0 text-[11px] text-ink-600">
                       {relativeTime(click.timestamp, now)}
