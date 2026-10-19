@@ -20,7 +20,7 @@ export default function BarList({ items, emptyMessage = 'No data for this period
           </div>
           <div className="h-2 overflow-hidden border border-base-700 bg-base-800">
             <div
-              className="h-full bg-accent-500"
+              className="h-full origin-left animate-bar-grow bg-accent-500"
               style={{ width: `${Math.max((item.value / max) * 100, 3)}%` }}
             />
           </div>

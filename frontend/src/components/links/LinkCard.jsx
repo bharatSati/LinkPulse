@@ -19,7 +19,7 @@ export default function LinkCard({
   const shortUrl = resolveShortUrl(link);
 
   return (
-    <div className="surface-card space-y-3 p-4">
+    <div className="surface-card interactive-lift space-y-3 p-4 hover:border-accent-600">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-medium text-ink-100">

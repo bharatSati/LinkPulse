@@ -213,7 +213,7 @@ export default function AiInsights() {
               <h2 className="text-sm font-semibold text-ink-100">What your data shows</h2>
               <span className="text-xs text-ink-500">Exact values from analytics</span>
             </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 stagger-children sm:grid-cols-2 xl:grid-cols-4">
               <StatCard
                 label="Clicks in period"
                 value={formatNumber(totals?.periodClicks ?? 0)}
@@ -257,7 +257,7 @@ export default function AiInsights() {
                 No significant spikes or drops detected in this period.
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 stagger-children lg:grid-cols-2">
                 {anomalies.map((anomaly, index) => (
                   <AnomalyAlert key={`${anomaly.subtype}-${index}`} anomaly={anomaly} />
                 ))}
@@ -284,7 +284,7 @@ export default function AiInsights() {
                   : 'No AI performance insights are available for this period.'}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 stagger-children lg:grid-cols-2">
                 {aiItems.map((item, index) => (
                   <InsightCard key={`${item.title}-${index}`} item={item} />
                 ))}
@@ -317,7 +317,7 @@ export default function AiInsights() {
                   'No recommendations available yet. Generate some traffic and try again.'}
               </div>
             ) : (
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 stagger-children lg:grid-cols-2">
                 {recItems.map((item, index) => (
                   <InsightCard key={`${item.title}-${index}`} item={item} />
                 ))}

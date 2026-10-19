@@ -42,7 +42,7 @@ export default function WorkspaceSwitcher() {
         trigger={
           <button
             type="button"
-            className="flex items-center gap-2 rounded-xl border border-base-700 bg-base-850 px-3 py-2 transition hover:border-base-600"
+            className="flex items-center gap-2 rounded-xl border border-base-700 bg-base-850 px-3 py-2 transition hover:border-accent-600"
           >
             <span className="flex h-5 w-5 items-center justify-center rounded-md bg-accent-500/15 text-accent-400">
               <Building2 className="h-3.5 w-3.5" />

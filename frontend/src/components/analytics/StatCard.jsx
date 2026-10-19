@@ -13,16 +13,18 @@ export default function StatCard({ label, value, icon: Icon, hint, change, loadi
   }
 
   return (
-    <div className="surface-card p-5">
+    <div className="surface-card group interactive-lift p-5 hover:border-accent-600">
       <div className="flex items-center justify-between">
         <p className="text-xs text-ink-500">{label}</p>
         {Icon && (
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-base-800 text-accent-400 ring-1 ring-base-700">
+          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-base-800 text-accent-400 ring-1 ring-base-700 transition group-hover:-translate-y-0.5 group-hover:ring-accent-600">
             <Icon className="h-4 w-4" />
           </span>
         )}
       </div>
-      <p className="mt-3 text-2xl font-semibold tracking-tight text-ink-100">{value}</p>
+      <p key={value} className="mt-3 animate-pop-in text-2xl font-semibold tracking-tight text-ink-100">
+        {value}
+      </p>
       {change != null ? (
         <p
           className={cn(

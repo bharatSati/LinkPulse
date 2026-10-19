@@ -234,9 +234,9 @@ export default function BioPages() {
         )
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 stagger-children sm:grid-cols-2 lg:grid-cols-3">
             {bioPages.map((bioPage) => (
-              <div key={bioPage.id} className="surface-card flex flex-col gap-4 p-4">
+              <div key={bioPage.id} className="surface-card interactive-lift flex flex-col gap-4 p-4 hover:border-accent-600">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <button

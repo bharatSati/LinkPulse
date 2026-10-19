@@ -382,7 +382,7 @@ export default function Links() {
             onShowQr={handleShowQr}
           />
 
-          <div className="space-y-3 md:hidden">
+          <div className="space-y-3 stagger-children md:hidden">
             {links.map((link) => (
               <LinkCard
                 key={link.id}

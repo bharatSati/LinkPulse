@@ -56,7 +56,7 @@ export default function Sidebar({ open, onClose }) {
                         cn(
                           'group relative flex items-center gap-3 px-3 py-2 text-sm transition',
                           isActive
-                            ? 'bg-accent-gradient-soft text-accent-300 shadow-[inset_2px_0_0_0_#cdf23f]'
+                            ? 'bg-accent-gradient-soft text-accent-300 before:absolute before:inset-y-0 before:left-0 before:w-0.5 before:bg-accent-500 before:shadow-glow'
                             : 'text-ink-300 hover:bg-base-800 hover:text-ink-100'
                         )
                       }

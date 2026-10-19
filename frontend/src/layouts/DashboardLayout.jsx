@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar.jsx';
 import Topbar from '../components/Topbar.jsx';
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const location = useLocation();
 
   return (
     <div className="min-h-screen bg-base-950">
@@ -14,7 +15,9 @@ export default function DashboardLayout() {
         <Topbar onOpenSidebar={() => setSidebarOpen(true)} />
         <main className="flex-1 px-4 py-6 lg:px-8 lg:py-8">
           <div className="mx-auto w-full max-w-6xl">
-            <Outlet />
+            <div key={location.pathname} className="animate-page-in">
+              <Outlet />
+            </div>
           </div>
         </main>
       </div>

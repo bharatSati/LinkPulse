@@ -131,14 +131,14 @@ export default function NotificationBell() {
       <button
         type="button"
         onClick={toggle}
-        className="relative rounded-lg p-2 text-ink-300 transition hover:bg-base-800 hover:text-ink-100"
+        className="relative rounded-lg p-2 text-ink-300 transition hover:bg-base-800 hover:text-ink-100 active:scale-95"
         aria-label={`Notifications${unread ? ` (${unread} unread)` : ''}`}
         aria-haspopup="menu"
         aria-expanded={open}
       >
         <Bell className="h-5 w-5" />
         {unread > 0 && (
-          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-none bg-danger-500 px-1 text-[10px] font-semibold text-white">
+          <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] animate-pop-in items-center justify-center rounded-none bg-danger-500 px-1 text-[10px] font-semibold text-white">
             {unread > 9 ? '9+' : unread}
           </span>
         )}

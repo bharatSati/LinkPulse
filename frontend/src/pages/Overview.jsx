@@ -176,7 +176,7 @@ export default function Overview() {
         />
       ) : (
         <>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 stagger-children sm:grid-cols-2 xl:grid-cols-4">
             <StatCard
               label="Total clicks"
               value={formatNumber(safeCounts.clicks)}
@@ -209,9 +209,9 @@ export default function Overview() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 stagger-children sm:grid-cols-3">
             {secondaryStats(safeCounts).map(({ key, label, value, icon: Icon }) => (
-              <Card key={key} className="flex items-center gap-4">
+              <Card key={key} interactive className="flex items-center gap-4">
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-base-800 text-accent-400 ring-1 ring-base-700">
                   <Icon className="h-5 w-5" />
                 </span>

@@ -1,8 +1,15 @@
 import { cn } from '../../utils/cn.js';
 
-export default function Card({ children, className, ...props }) {
+export default function Card({ children, className, interactive = false, ...props }) {
   return (
-    <div className={cn('surface-card p-5', className)} {...props}>
+    <div
+      className={cn(
+        'surface-card p-5',
+        interactive && 'interactive-lift hover:border-accent-600',
+        className
+      )}
+      {...props}
+    >
       {children}
     </div>
   );

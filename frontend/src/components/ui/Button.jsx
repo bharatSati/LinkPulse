@@ -40,8 +40,8 @@ const Button = forwardRef(function Button(
       type={type}
       disabled={disabled || loading}
       className={cn(
-        'inline-flex select-none items-center justify-center gap-2 rounded-none border-2 font-medium uppercase tracking-wider transition duration-100',
-        'active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
+        'inline-flex select-none items-center justify-center gap-2 rounded-none border-2 font-medium uppercase tracking-wider transition duration-150',
+        'hover:-translate-y-0.5 active:translate-x-0.5 active:translate-y-0.5 active:shadow-none',
         'disabled:cursor-not-allowed disabled:translate-x-0 disabled:translate-y-0 disabled:border-base-600 disabled:bg-base-800 disabled:bg-none disabled:text-ink-500 disabled:shadow-none disabled:brightness-100',
         VARIANTS[variant],
         SIZES[size],

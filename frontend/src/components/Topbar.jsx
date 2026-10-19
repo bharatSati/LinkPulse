@@ -36,7 +36,7 @@ export default function Topbar({ onOpenSidebar }) {
         <button
           type="button"
           onClick={onOpenSidebar}
-          className="rounded-lg p-2 text-ink-300 transition hover:bg-base-800 hover:text-ink-100 lg:hidden"
+          className="rounded-lg p-2 text-ink-300 transition hover:bg-base-800 hover:text-ink-100 active:scale-95 lg:hidden"
           aria-label="Open navigation"
         >
           <Menu className="h-5 w-5" />

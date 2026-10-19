@@ -55,7 +55,7 @@ export function ToastProvider({ children }) {
             <div
               key={id}
               role="status"
-              className={`pointer-events-auto flex w-full max-w-sm animate-slide-in-right items-start gap-3 rounded-xl border bg-base-850/95 px-4 py-3 shadow-panel ${STYLES[type]}`}
+              className={`pointer-events-auto relative flex w-full max-w-sm animate-slide-in-right items-start gap-3 overflow-hidden rounded-xl border bg-base-850/95 px-4 py-3 shadow-panel ${STYLES[type]}`}
             >
               <Icon className="mt-0.5 h-4 w-4 shrink-0" />
               <p className="flex-1 text-sm text-ink-100">{message}</p>
@@ -67,6 +67,10 @@ export function ToastProvider({ children }) {
               >
                 <X className="h-4 w-4" />
               </button>
+              <span
+                className="absolute inset-x-0 bottom-0 h-0.5 origin-left animate-toast-progress bg-current opacity-60"
+                aria-hidden="true"
+              />
             </div>
           );
         })}

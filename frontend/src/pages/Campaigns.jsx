@@ -313,7 +313,7 @@ export default function Campaigns() {
             onDelete={setDeleteTarget}
           />
 
-          <div className="space-y-3 md:hidden">
+          <div className="space-y-3 stagger-children md:hidden">
             {campaigns.map((campaign) => (
               <CampaignCard
                 key={campaign.id}
