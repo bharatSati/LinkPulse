@@ -13,9 +13,7 @@ One workspace. Every link, channel, scan, and teammate accounted for.
 
 ## 🎬 Product Demo
 
-[![LinkPulse Product Demo](./assets/demo-thumbnail.png)](https://youtu.be/viEbUPmOQiU)
-
-*Click the thumbnail above to watch the full product walkthrough.*
+[![LinkPulse Product Demo](https://img.youtube.com/vi/viEbUPmOQiU/hqdefault.jpg)](https://youtu.be/viEbUPmOQiU)
 
 ---
 
