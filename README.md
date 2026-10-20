@@ -10,7 +10,6 @@ One workspace. Every link, channel, scan, and teammate accounted for.
 > **Watch the full product walkthrough:** [LinkPulse demo video](https://youtu.be/viEbUPmOQiU)
 
 [![LinkPulse Product Demo](https://img.youtube.com/vi/viEbUPmOQiU/maxresdefault.jpg)](https://youtu.be/viEbUPmOQiU)
-> <!-- Replace LIVE_URL_HERE with the deployed app URL and VIDEO_URL_HERE with the GitHub-hosted video link. -->
 
 ---
 
