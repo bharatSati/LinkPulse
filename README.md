@@ -6,9 +6,11 @@ Most shorteners hand you a shorter URL and call it a day. LinkPulse keeps going:
 
 One workspace. Every link, channel, scan, and teammate accounted for.
 
+> **Live app:** [Try LinkPulse]https://link-pulse-orcin.vercel.app/
+>
 > **Watch the full product walkthrough:** [LinkPulse demo video](VIDEO_URL_HERE)
 >
-> <!-- Replace VIDEO_URL_HERE with the GitHub-hosted video link after uploading it above this line. -->
+> <!-- Replace LIVE_URL_HERE with the deployed app URL and VIDEO_URL_HERE with the GitHub-hosted video link. -->
 
 ---
 
@@ -43,7 +45,6 @@ The rest of this README is the long, interesting version.
 14. [Security and privacy](#14-security-and-privacy)
 15. [Under the hood](#15-under-the-hood)
 16. [Run it locally](#16-run-it-locally)
-17. [Honest limitations and what comes next](#17-honest-limitations-and-what-comes-next)
 
 ---
 
@@ -777,25 +778,6 @@ docker run -p 1025:1025 -p 8025:8025 axllent/mailpit
 Then set `SMTP_HOST=localhost`, `SMTP_PORT=1025`, `MAIL_FROM="LinkPulse <no-reply@local.test>"`, and open `http://localhost:8025`.
 
 </details>
-
----
-
-## 17. Honest limitations and what comes next
-
-LinkPulse is complete as a product build, and a few boundaries are deliberate:
-
-- Account passwords are plain text for this foundation release (link passwords are hashed). This is the first thing to replace before a public launch.
-- Country data depends on a CDN or proxy forwarding trusted geo headers; without one, location analytics clearly reports that no geographic data is available.
-- The real-time layer uses an in-process event emitter, which is ideal for a single API instance. Horizontal scaling would need a shared bus such as Redis pub/sub.
-- The platform does not claim custom domains or QR centre-logo embedding; the QR studio focuses on colour, size, error correction, and clean PNG/SVG output.
-
-Natural next steps: argon2/bcrypt account passwords, Redis-backed real-time fan-out, custom domains, scheduled report exports, more granular retention controls, and deeper campaign attribution.
-
----
-
-## License
-
-MIT. See the package metadata for details.
 
 ---
 
