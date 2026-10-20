@@ -5,11 +5,17 @@
 Most shorteners hand you a shorter URL and call it a day. LinkPulse keeps going: it watches every click land on a live globe, turns traffic into campaign-level insight, gives every link a QR code and a bio page, asks AI what the numbers mean, and gives a whole team the guardrails to work on it safely.
 One workspace. Every link, channel, scan, and teammate accounted for.
 
+One workspace. Every link, channel, scan, and teammate accounted for.
+
 > **Live app:** [Try LinkPulse](https://link-pulse-orcin.vercel.app/)
 
 > **Watch the full product walkthrough:** [LinkPulse demo video](https://youtu.be/viEbUPmOQiU)
 
-[![LinkPulse Product Demo](https://img.youtube.com/vi/viEbUPmOQiU/maxresdefault.jpg)](https://youtu.be/viEbUPmOQiU)
+## 🎬 Product Demo
+
+[![LinkPulse Product Demo](./assets/demo-thumbnail.png)](https://youtu.be/viEbUPmOQiU)
+
+*Click the thumbnail above to watch the full product walkthrough.*
 
 ---
 
