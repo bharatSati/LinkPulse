@@ -6,7 +6,7 @@ Most shorteners hand you a shorter URL and call it a day. LinkPulse keeps going:
 
 One workspace. Every link, channel, scan, and teammate accounted for.
 
-> **Live app:** [Try LinkPulse]https://link-pulse-orcin.vercel.app/
+> **Live app:** [Try LinkPulse](https://link-pulse-orcin.vercel.app/)
 >
 > **Watch the full product walkthrough:** [LinkPulse demo video](VIDEO_URL_HERE)
 >
